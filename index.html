@@ -3,496 +3,802 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stalcraft Farm Tracker</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%230f111a' stroke='%23818cf8' stroke-width='8'/><path d='M50 10A40 40 0 0 1 90 50A40 40 0 0 0 50 10' fill='%23818cf8'/></svg>">
+    <title>Stalcraft Income Tracker & Cloud</title>
     <style>
         :root {
-            --bg-gradient-start: #0f111a;
-            --bg-gradient-end: #07080c;
-            --panel-bg: rgba(22, 26, 41, 0.65);
-            --panel-border: rgba(255, 255, 255, 0.08);
-            --input-bg: rgba(10, 12, 20, 0.8);
-            --input-border: rgba(255, 255, 255, 0.12);
-            --input-focus: #4f46e5;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
-            --accent-green: #34d399;
-            --accent-orange: #fb923c;
-            --accent-purple: #818cf8;
-            --card-inner-bg: rgba(255, 255, 255, 0.02);
+            --bg-dark: #0b0c10;
+            --bg-card: rgba(31, 40, 51, 0.4);
+            --bg-card-hover: rgba(31, 40, 51, 0.6);
+            --border-glow: #45f3ff;
+            --border-dim: rgba(69, 243, 255, 0.2);
+            --text-main: #c5c6c7;
+            --text-bright: #fff;
+            --accent-green: #00ffcc;
+            --accent-red: #ff3366;
+            --neon-shadow: 0 0 15px rgba(69, 243, 255, 0.4);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
         body {
-            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            background: radial-gradient(circle at center, #1f2833 0%, var(--bg-dark) 100%);
             color: var(--text-main);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 40px 20px;
-        }
-
-        .dashboard-layout {
-            display: grid;
-            grid-template-columns: 1.8fr 1fr;
-            gap: 32px;
-            width: 100%;
-            max-width: 1200px;
-            align-items: start;
-        }
-
-        .main-panel, .stats-panel {
-            background: var(--panel-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--panel-border);
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        .stats-panel {
             display: flex;
             flex-direction: column;
-            gap: 24px;
-            position: sticky;
-            top: 40px;
-        }
-
-        .header { margin-bottom: 32px; }
-        .header h1 {
-            font-size: 26px;
-            font-weight: 800;
-            background: linear-gradient(to right, #fff, var(--text-muted));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .config-block {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--panel-border);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 20px;
-            display: flex;
-            gap: 12px;
             align-items: center;
         }
 
-        .input-block {
-            background: rgba(255, 255, 255, 0.01);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 18px;
-            padding: 24px;
-            margin-bottom: 32px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .inputs-inline {
-            display: grid;
-            grid-template-columns: 1.2fr 1fr auto;
-            gap: 16px;
-            align-items: flex-end;
-        }
-
-        .form-group { display: flex; flex-direction: column; gap: 8px; flex-grow: 1; }
-        label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.75px; }
-        
-        input {
+        .container {
             width: 100%;
-            background: var(--input-bg);
-            border: 1px solid var(--input-border);
-            color: var(--text-main);
-            padding: 14px 16px;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            outline: none;
-        }
-        input:focus { border-color: var(--input-focus); }
-
-        .btn-trigger-sold {
-            background: rgba(251, 146, 60, 0.1);
-            border: 1px solid rgba(251, 146, 60, 0.2);
-            color: var(--accent-orange);
-            padding: 10px 16px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            align-self: flex-start;
+            max-width: 1100px;
+            animation: fadeIn 0.8s ease-out;
         }
 
-        .sold-input-wrapper { display: none; }
-        .sold-input-wrapper.active { display: flex; }
-
-        .btn-submit {
-            background: #ffffff; color: #000; border: none; padding: 14px 24px;
-            border-radius: 12px; font-weight: 800; font-size: 15px; cursor: pointer; height: 50px;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .history-list { display: flex; flex-direction: column; gap: 14px; }
-        .history-row {
-            background: var(--card-inner-bg);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 16px;
-            padding: 22px 28px;
-            display: grid;
-            grid-template-columns: 0.8fr 1.5fr 1.5fr auto;
-            align-items: center;
-            gap: 20px;
+        header {
+            text-align: center;
+            margin-bottom: 40px;
             position: relative;
         }
-        .history-row.has-profit::before { content: ''; position: absolute; top:0; left:0; width:4px; height:100%; background: var(--accent-green); }
-        .history-row.has-loss::before { content: ''; position: absolute; top:0; left:0; width:4px; height:100%; background: #ef4444; }
 
-        .cell-date { font-size: 15px; font-weight: 700; color: var(--text-muted); }
-        .cell-label { font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
-        .cell-value { font-size: 17px; font-weight: 700; }
-        .cell-value.green { color: var(--accent-green); }
-        .cell-value.red { color: #ef4444; }
-        .sub-sold { color: var(--accent-orange); font-size: 12px; display: block; margin-top: 4px; }
+        header h1 {
+            color: var(--text-bright);
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: var(--neon-shadow);
+            margin-bottom: 10px;
+        }
 
-        .btn-delete { background: none; border: none; color: rgba(239, 68, 68, 0.4); cursor: pointer; font-weight: 700; }
-        .btn-delete:hover { color: #ef4444; }
+        header p {
+            color: var(--border-glow);
+            font-size: 1rem;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
 
-        .stat-card { background: var(--card-inner-bg); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 16px; padding: 20px; }
-        .stat-card .label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
-        .stat-card .value { font-size: 22px; font-weight: 800; }
-        .stat-card.total-earned .value { color: var(--accent-green); }
-        .stat-card.total-sold .value { color: var(--accent-orange); }
-        .stat-card.avg-earned .value { color: var(--accent-purple); }
+        /* Общие стили блоков */
+        .glass-panel {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border-dim);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            overflow: hidden;
+        }
 
-        .sync-status { font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 10px; }
+        .glass-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            transition: 0.5s;
+        }
+
+        .glass-panel:hover::before {
+            left: 100%;
+        }
+
+        .glass-panel:hover {
+            border-color: var(--border-glow);
+            box-shadow: var(--neon-shadow);
+            transform: translateY(-5px);
+            background: var(--bg-card-hover);
+        }
+
+        /* Панель синхронизации */
+        .sync-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 20px;
+            align-items: end;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-bright);
+        }
+
+        .input-field {
+            background: rgba(11, 12, 16, 0.7);
+            border: 1px solid var(--border-dim);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: var(--text-bright);
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--border-glow);
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.2);
+        }
+
+        .btn {
+            background: transparent;
+            border: 1px solid var(--border-glow);
+            color: var(--border-glow);
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 0 5px rgba(69, 243, 255, 0.1);
+        }
+
+        .btn:hover {
+            background: var(--border-glow);
+            color: var(--bg-dark);
+            box-shadow: var(--neon-shadow);
+        }
+
+        .btn:disabled {
+            border-color: var(--border-dim);
+            color: var(--border-dim);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-primary {
+            background: var(--border-glow);
+            color: var(--bg-dark);
+            box-shadow: var(--neon-shadow);
+        }
+
+        .btn-primary:hover {
+            background: transparent;
+            color: var(--border-glow);
+        }
+
+        /* Статистика */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border-dim);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            animation: cardSpawn 0.5s ease-out both;
+        }
+
+        @keyframes cardSpawn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .stat-card:hover {
+            border-color: var(--border-glow);
+            box-shadow: var(--neon-shadow);
+            transform: translateY(-5px);
+            background: var(--bg-card-hover);
+        }
+
+        .stat-card h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            color: var(--text-main);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-bright);
+            text-shadow: 0 0 10px rgba(255,255,255,0.1);
+        }
+
+        .stat-card.highlight .stat-value {
+            color: var(--border-glow);
+            text-shadow: var(--neon-shadow);
+        }
+
+        /* Основной контент */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+
+        /* Форма добавления */
+        .entry-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            padding: 5px 0;
+        }
+
+        .checkbox-container input {
+            display: none;
+        }
+
+        .checkmark {
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--border-dim);
+            border-radius: 4px;
+            display: inline-block;
+            position: relative;
+            background: rgba(11, 12, 16, 0.7);
+            transition: all 0.2s;
+        }
+
+        .checkbox-container:hover .checkmark {
+            border-color: var(--border-glow);
+        }
+
+        .checkbox-container input:checked + .checkmark {
+            background: var(--border-glow);
+            border-color: var(--border-glow);
+            box-shadow: 0 0 8px rgba(69, 243, 255, 0.5);
+        }
+
+        .checkbox-container input:checked + .checkmark::after {
+            content: "✓";
+            position: absolute;
+            color: var(--bg-dark);
+            font-size: 14px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Список логов */
+        .logs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-dim);
+            padding-bottom: 15px;
+        }
+
+        .logs-header h2 {
+            color: var(--text-bright);
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+        }
+
+        .logs-container {
+            max-height: 480px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .logs-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .logs-container::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+
+        .logs-container::-webkit-scrollbar-thumb {
+            background: var(--border-dim);
+            border-radius: 4px;
+        }
+
+        .logs-container::-webkit-scrollbar-thumb:hover {
+            background: var(--border-glow);
+        }
+
+        .log-item {
+            display: grid;
+            grid-template-columns: auto 1fr auto auto;
+            align-items: center;
+            gap: 15px;
+            background: rgba(11, 12, 16, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+            animation: logSpawn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+        }
+
+        @keyframes logSpawn {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .log-item:hover {
+            border-color: var(--border-dim);
+            background: rgba(11, 12, 16, 0.6);
+            transform: scale(1.01);
+        }
+
+        .log-day {
+            background: var(--border-dim);
+            color: var(--border-glow);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            min-width: 65px;
+            text-align: center;
+        }
+
+        .log-comment {
+            color: var(--text-main);
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .log-amount {
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .log-amount.plus { color: var(--accent-green); }
+        .log-amount.minus { color: var(--accent-red); }
+
+        .btn-delete {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0 5px;
+            transition: color 0.2s;
+        }
+
+        .btn-delete:hover {
+            color: var(--accent-red);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: rgba(197, 198, 199, 0.4);
+            padding: 40px 0;
+            font-style: italic;
+        }
+
+        /* Статус синхронизации */
+        .status-banner {
+            font-size: 0.85rem;
+            padding: 8px 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .status-banner.success {
+            background: rgba(0, 255, 204, 0.1);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+            display: block;
+        }
+
+        .status-banner.error {
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+            display: block;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 900px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .sync-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
-<div class="dashboard-layout">
-    <div class="main-panel">
-        <div class="header">
-            <h1>Мониторинг Фарма Сталкрафта Cloud</h1>
-        </div>
+<div class="container">
+    <header>
+        <h1>Stalcraft Income Tracker</h1>
+        <p>Управление финансами с облачной синхронизацией GitHub</p>
+    </header>
 
-        <!-- Настройка облака -->
-        <div class="config-block">
-            <div class="form-group">
-                <label>GitHub Токен (Классический)</label>
-                <input type="password" id="ghToken" placeholder="ghp_...">
+    <!-- Блок облака -->
+    <div class="glass-panel">
+        <div class="sync-grid">
+            <div class="input-group">
+                <label for="ghToken">GitHub Personal Access Token</label>
+                <input type="password" id="ghToken" class="input-field" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
             </div>
-            <div class="form-group">
-                <label>Твой ник на GitHub</label>
-                <input type="text" id="ghUser" placeholder="username">
-            </div>
-            <div class="form-group">
-                <label>Имя репозитория</label>
-                <input type="text" id="ghRepo" placeholder="stalcraft-tracker" value="stalcraft-tracker">
-            </div>
+            <button id="btnConnect" class="btn btn-primary" onclick="initGitHubCloud()">Подключить Облако</button>
+            <button id="btnSync" class="btn" onclick="syncDataToCloud()" disabled>Сохранить в Cloud</button>
         </div>
-
-        <div class="input-block">
-            <div class="inputs-inline">
-                <div class="form-group">
-                    <label for="logDate">Дата занесения</label>
-                    <input type="date" id="logDate">
-                </div>
-                <div class="form-group">
-                    <label for="currentBalance">Нынешний баланс на счету</label>
-                    <input type="number" id="currentBalance" placeholder="Введите">
-                </div>
-                <button class="btn-submit" id="addDayBtn">Добавить день</button>
-            </div>
-            <div class="sold-toggle-zone">
-                <button class="btn-trigger-sold" id="toggleSoldBtn">+ ПРОДАНО СЕГОДНЯ</button>
-                <div class="sold-input-wrapper" id="soldWrapper">
-                    <div class="form-group">
-                        <label for="soldAmount">Сколько слил на FunPay за сегодня</label>
-                        <input type="number" id="soldAmount" value="0">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="history-list" id="historyContainer"></div>
+        <div id="statusBanner" class="status-banner"></div>
     </div>
 
-    <div class="stats-panel">
-        <div class="stats-header"><h2>Аналитика аккаунта</h2></div>
-        <div class="stat-card total-earned">
-            <div class="label">Заработано за всё время</div>
-            <div class="value" id="statTotalEarned">0</div>
+    <!-- Виджеты статистики -->
+    <div class="stats-grid">
+        <div class="stat-card highlight">
+            <h3>Чистый Баланс</h3>
+            <div id="statTotal" class="stat-value">0 руб.</div>
         </div>
-        <div class="stat-card total-sold">
-            <div class="label">Всего слито (FunPay)</div>
-            <div class="value" id="statTotalSold">0</div>
+        <div class="stat-card">
+            <h3>Дней отслежено</h3>
+            <div id="statDaysCount" class="stat-value">0</div>
         </div>
-        <div class="stat-card avg-earned">
-            <div class="label">Медиана дохода (в день)</div>
-            <div class="value" id="statAvgEarned">0</div>
+        <div class="stat-card">
+            <h3>Среднее (Медиана)</h3>
+            <div id="statMedian" class="stat-value">0 руб.</div>
         </div>
-        <div class="sync-status" id="syncStatus">Статус: Загрузка локальных данных...</div>
+        <div class="stat-card">
+            <h3>Всего Выведено</h3>
+            <div id="statFunpayTotal" class="stat-value">0 руб.</div>
+        </div>
+    </div>
+
+    <!-- Сетка формы и логов -->
+    <div class="main-grid">
+        <!-- Форма -->
+        <div class="glass-panel">
+            <div class="entry-form">
+                <div class="input-group">
+                    <label for="amount">Сумма (руб.)</label>
+                    <input type="number" id="amount" class="input-field" placeholder="Например: 50000 или -15000">
+                </div>
+                <div class="input-group">
+                    <label for="comment">Комментарий / Источник</label>
+                    <input type="text" id="comment" class="input-field" placeholder="Фарм кабанчиков, вынос артов">
+                </div>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="isFunPay">
+                    <span class="checkmark"></span>
+                    Это вывод на FunPay (комиссия -14%)
+                </label>
+                <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="addEntry()">Зафиксировать день</button>
+            </div>
+        </div>
+
+        <!-- Таблица логов -->
+        <div class="glass-panel">
+            <div class="logs-header">
+                <h2>История доходов и выводов</h2>
+                <button class="btn" style="padding: 6px 14px; font-size: 0.8rem;" onclick="clearAllData()">Очистить всё</button>
+            </div>
+            <div id="logsContainer" class="logs-container">
+                <!-- Логи рендерятся тут скриптом -->
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
-    const logDateInput = document.getElementById('logDate');
-    const currentBalanceInput = document.getElementById('currentBalance');
-    const soldAmountInput = document.getElementById('soldAmount');
-    const addDayBtn = document.getElementById('addDayBtn');
-    const toggleSoldBtn = document.getElementById('toggleSoldBtn');
-    const soldWrapper = document.getElementById('soldWrapper');
-    const historyContainer = document.getElementById('historyContainer');
-    const statTotalEarned = document.getElementById('statTotalEarned');
-    const statTotalSold = document.getElementById('statTotalSold');
-    const statAvgEarned = document.getElementById('statAvgEarned');
-    const syncStatus = document.getElementById('syncStatus');
+    // Инициализация структуры данных
+    let trackerState = {
+        currentDay: 1,
+        logs: []
+    };
 
-    const ghTokenInput = document.getElementById('ghToken');
-    const ghUserInput = document.getElementById('ghUser');
-    const ghRepoInput = document.getElementById('ghRepo');
+    // Данные для GitHub интеграции
+    const REPO_NAME = "stalcraft-tracker";
+    const FILE_PATH = "data.json";
+    let GITHUB_TOKEN = "";
+    let fileSha = null;
 
-    let farmLog = [];
-    let fileSha = ""; // Нужно GitHub для перезаписи файла
-
-    // Загрузка настроек из localStorage
-    ghTokenInput.value = localStorage.getItem('gh_token') || '';
-    ghUserInput.value = localStorage.getItem('gh_user') || '';
-    ghRepoInput.value = localStorage.getItem('gh_repo') || 'stalcraft-tracker';
-
-    function saveConfig() {
-        localStorage.setItem('gh_token', ghTokenInput.value);
-        localStorage.setItem('gh_user', ghUserInput.value);
-        localStorage.setItem('gh_repo', ghRepoInput.value);
-    }
-
-    ghTokenInput.addEventListener('change', () => { saveConfig(); loadFromGitHub(); });
-    ghUserInput.addEventListener('change', () => { saveConfig(); loadFromGitHub(); });
-    ghRepoInput.addEventListener('change', () => { saveConfig(); loadFromGitHub(); });
-
-    function formatNumberWithSpaces(num) { return Math.round(num).toLocaleString('ru-RU'); }
-
-    function setDefaultDate() {
-        const today = new Date();
-        logDateInput.value = today.toISOString().split('T')[0];
-    }
-
-    toggleSoldBtn.addEventListener('click', () => {
-        soldWrapper.classList.toggle('active');
-        if(!soldWrapper.classList.contains('active')) soldAmountInput.value = '0';
-    });
-
-    // Функция загрузки базы из GitHub репозитория (файл data.json)
-    async function loadFromGitHub() {
-        const token = ghTokenInput.value;
-        const user = ghUserInput.value;
-        const repo = ghRepoInput.value;
-
-        if (!token || !user || !repo) {
-            syncStatus.textContent = "Статус: Введи данные GitHub для синхронизации";
-            // Временный откат на локальное хранилище
-            farmLog = JSON.parse(localStorage.getItem('stalcraftFarmLog')) || [];
-            renderAll();
-            return;
-        }
-
-        syncStatus.textContent = "Статус: Синхронизация с облаком...";
-        const url = `https://api.github.com/repos/${user}/${repo}/contents/data.json`;
-
-        try {
-            const res = await fetch(url, {
-                headers: { 'Authorization': `token ${token}` }
-            });
-            if (res.status === 200) {
-                const data = await res.json();
-                fileSha = data.sha;
-                const content = decodeURIComponent(atob(data.content).split('').map(function(c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join(''));
-                farmLog = JSON.parse(content);
-                syncStatus.textContent = "Статус: Облачные данные загружены";
-            } else if (res.status === 404) {
-                syncStatus.textContent = "Статус: Облачный файл не найден, будет создан новый";
-                farmLog = [];
-            }
-        } catch (err) {
-            syncStatus.textContent = "Статус: Ошибка сети при связи с GitHub";
-        }
-        renderAll();
-    }
-
-    // Функция сохранения лога на GitHub
-    async function saveToGitHub() {
-        const token = ghTokenInput.value;
-        const user = ghUserInput.value;
-        const repo = ghRepoInput.value;
-
-        // Дублируем локально на всякий случай
-        localStorage.setItem('stalcraftFarmLog', JSON.stringify(farmLog));
-
-        if (!token || !user || !repo) return;
-
-        syncStatus.textContent = "Статус: Сохранение в облако...";
-        const url = `https://api.github.com/repos/${user}/${repo}/contents/data.json`;
+    // Загрузка локальных данных при старте
+    window.onload = function() {
+        const localData = localStorage.getItem('stalcraft_tracker_data');
+        const savedToken = localStorage.getItem('stalcraft_gh_token');
         
-        // Корректный перевод кириллицы в base64
-        const jsonStr = JSON.stringify(farmLog, null, 2);
-        const b64Content = btoa(encodeURIComponent(jsonStr).replace(/%([0-9A-F]{2})/g, function(match, p1) {
-            return String.fromCharCode('0x' + p1);
-        }));
-
-        const bodyData = {
-            message: "auto-update farm log",
-            content: b64Content
-        };
-        if (fileSha) bodyData.sha = fileSha;
-
-        try {
-            const res = await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(bodyData)
-            });
-            if (res.ok) {
-                const resData = await res.json();
-                fileSha = resData.content.sha; // Обновляем SHA для следующих коммитов
-                syncStatus.textContent = "Статус: Данные успешно сохранены на GitHub!";
-            } else {
-                syncStatus.textContent = "Статус: Ошибка сохранения на GitHub";
-            }
-        } catch (err) {
-            syncStatus.textContent = "Статус: Ошибка сети при отправке";
+        if (localData) {
+            trackerState = JSON.parse(localData);
         }
-    }
+        if (savedToken) {
+            document.getElementById('ghToken').value = savedToken;
+        }
+        
+        updateUI();
+    };
 
-    addDayBtn.addEventListener('click', async () => {
-        const todayBalance = parseFloat(currentBalanceInput.value);
-        const todaySold = parseFloat(soldAmountInput.value) || 0;
-        const selectedDateRaw = logDateInput.value;
+    // Функция ручного добавления новой записи
+    function addEntry() {
+        const amountInput = document.getElementById('amount');
+        const commentInput = document.getElementById('comment');
+        const isFunPayCheck = document.getElementById('isFunPay');
 
-        if (!selectedDateRaw || isNaN(todayBalance) || todayBalance < 0) {
-            alert('Заполни корректно дату и баланс');
+        let rawAmount = parseFloat(amountInput.value);
+        let comment = commentInput.value.trim() || "Без комментария";
+
+        if (isNaN(rawAmount)) {
+            showStatus("Введите корректную сумму", "error");
             return;
         }
 
-        const [yyyy, mm, dd] = selectedDateRaw.split('-');
-        const formattedDate = `${dd}.${mm}`;
-
-        const existingIndex = farmLog.findIndex(item => item.date === formattedDate);
-        if (existingIndex !== -1) {
-            if(confirm(`Запись за ${formattedDate} уже есть. Перезаписать?`)) {
-                farmLog.splice(existingIndex, 1);
-            } else { return; }
+        // Если чекбокс активен, вычитаем 14% комиссии FunPay
+        if (isFunPayCheck.checked && rawAmount > 0) {
+            rawAmount = Math.round(rawAmount * 0.86);
+            comment += " (FunPay -14%)";
         }
 
-        farmLog.push({
-            date: formattedDate,
-            rawDate: selectedDateRaw,
-            balance: todayBalance,
-            sold: todaySold,
-            earned: 0
-        });
+        const newLog = {
+            day: trackerState.currentDay,
+            amount: rawAmount,
+            comment: comment,
+            isFunPay: isFunPayCheck.checked,
+            timestamp: new Date().toISOString()
+        };
 
-        farmLog.sort((a, b) => new Date(b.rawDate) - new Date(a.rawDate));
-        recalculateEarnedValues();
+        trackerState.logs.unshift(newLog);
+        trackerState.currentDay++;
 
-        currentBalanceInput.value = '';
-        soldAmountInput.value = '0';
-        soldWrapper.classList.remove('active');
-        setDefaultDate();
+        // Сброс полей формы
+        amountInput.value = "";
+        commentInput.value = "";
+        isFunPayCheck.checked = false;
 
-        renderAll();
-        await saveToGitHub();
-    });
+        saveToLocalStorage();
+        updateUI();
+        
+        // Автоматический триггер синхронизации, если облако подключено
+        if (GITHUB_TOKEN) {
+            syncDataToCloud();
+        }
+    }
 
-    function recalculateEarnedValues() {
-        for (let i = farmLog.length - 1; i >= 0; i--) {
-            if (i === farmLog.length - 1) {
-                farmLog[i].earned = 0;
-            } else {
-                const prevDay = farmLog[i + 1];
-                farmLog[i].earned = (farmLog[i].balance - prevDay.balance) + farmLog[i].sold;
+    // Удаление отдельной строки
+    function deleteLog(dayToDelete) {
+        trackerState.logs = trackerState.logs.filter(item => item.day !== dayToDelete);
+        saveToLocalStorage();
+        updateUI();
+        
+        if (GITHUB_TOKEN) {
+            syncDataToCloud();
+        }
+    }
+
+    // Полный сброс
+    function clearAllData() {
+        if (confirm("Вы уверены, что хотите полностью стереть всю историю?")) {
+            trackerState = { currentDay: 1, logs: [] };
+            saveToLocalStorage();
+            updateUI();
+            if (GITHUB_TOKEN) {
+                syncDataToCloud();
             }
         }
     }
 
+    function saveToLocalStorage() {
+        localStorage.setItem('stalcraft_tracker_data', JSON.stringify(trackerState));
+    }
+
+    // Подсчет медианы
     function calculateMedian(arr) {
         if (arr.length === 0) return 0;
         const sorted = [...arr].sort((a, b) => a - b);
         const mid = Math.floor(sorted.length / 2);
-        return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+        return sorted.length % 2 !== 0 ? sorted[mid] : Math.round((sorted[mid - 1] + sorted[mid]) / 2);
     }
 
-    function updateAnalytics() {
-        if (farmLog.length < 2) {
-            statTotalEarned.textContent = '0'; statTotalSold.textContent = '0'; statAvgEarned.textContent = '0';
-            return;
-        }
-        let totalEarned = 0; let totalSold = 0; let activeDays = [];
-        for (let i = 0; i < farmLog.length - 1; i++) {
-            totalEarned += farmLog[i].earned;
-            totalSold += farmLog[i].sold;
-            activeDays.push(farmLog[i]);
-        }
-        const earnedValues = activeDays.map(d => d.earned);
-        statTotalEarned.textContent = formatNumberWithSpaces(totalEarned);
-        statTotalSold.textContent = formatNumberWithSpaces(totalSold);
-        statAvgEarned.textContent = formatNumberWithSpaces(calculateMedian(earnedValues));
-    }
+    // Обновление интерфейса страницы
+    function updateUI() {
+        let totalBalance = 0;
+        let totalFunPay = 0;
+        let incomeListForMedian = [];
 
-    window.deleteRow = async function(index) {
-        if(confirm('Удалить эту запись?')) {
-            farmLog.splice(index, 1);
-            recalculateEarnedValues();
-            renderAll();
-            await saveToGitHub();
-        }
-    }
+        const container = document.getElementById('logsContainer');
+        container.innerHTML = "";
 
-    function renderLog() {
-        historyContainer.innerHTML = '';
-        if (farmLog.length === 0) {
-            historyContainer.innerHTML = '<div style="text-align:center; color:var(--text-muted); font-size:14px; padding:20px;">Лог пуст. Занеси первый баланс.</div>';
-            return;
-        }
+        if (trackerState.logs.length === 0) {
+            container.innerHTML = '<div class="empty-state">Журнал пуст. Введите данные за первый день фарма.</div>';
+        } else {
+            trackerState.logs.forEach(log => {
+                totalBalance += log.amount;
+                
+                if (log.isFunPay) {
+                    totalFunPay += log.amount;
+                } else if (log.amount > 0) {
+                    incomeListForMedian.push(log.amount);
+                }
 
-        farmLog.forEach((item, index) => {
-            const row = document.createElement('div');
-            let statusClass = ''; let earnedClass = ''; let sign = '';
-
-            if (index === farmLog.length - 1) { earnedClass = ''; sign = ''; }
-            else if (item.earned > 0) { statusClass = 'has-profit'; earnedClass = 'green'; sign = '+'; }
-            else if (item.earned < 0) { statusClass = 'has-loss'; earnedClass = 'red'; }
-
-            row.className = `history-row ${statusClass}`;
-            row.innerHTML = `
-                <div class="cell-date">${item.date}</div>
-                <div>
-                    <div class="cell-label">Заработано фармом</div>
-                    <div class="cell-value ${earnedClass}">
-                        ${index === farmLog.length - 1 ? '— (База)' : sign + formatNumberWithSpaces(item.earned)}
+                const itemHtml = `
+                    <div class="log-item">
+                        <div class="log-day">День ${log.day}</div>
+                        <div class="log-comment">${log.comment}</div>
+                        <div class="log-amount ${log.amount >= 0 ? 'plus' : 'minus'}">
+                            ${log.amount >= 0 ? '+' : ''}${log.amount.toLocaleString()} руб.
+                        </div>
+                        <button class="btn-delete" onclick="deleteLog(${log.day})">×</button>
                     </div>
-                </div>
-                <div>
-                    <div class="cell-label">Баланс на счету</div>
-                    <div class="cell-value">${formatNumberWithSpaces(item.balance)}</div>
-                    ${item.sold > 0 ? `<span class="sub-sold">Продано: ${formatNumberWithSpaces(item.sold)}</span>` : ''}
-                </div>
-                <div><button class="btn-delete" onclick="deleteRow(${index})">Удалить</button></div>
-            `;
-            historyContainer.appendChild(row);
-        });
+                `;
+                container.insertAdjacentHTML('beforeend', itemHtml);
+            });
+        }
+
+        // Обновляем плашки со статистикой
+        document.getElementById('statTotal').innerText = `${totalBalance.toLocaleString()} руб.`;
+        document.getElementById('statDaysCount').innerText = trackerState.logs.length;
+        document.getElementById('statFunpayTotal').innerText = `${totalFunPay.toLocaleString()} руб.`;
+        document.getElementById('statMedian').innerText = `${calculateMedian(incomeListForMedian).toLocaleString()} руб.`;
     }
 
-    function renderAll() { renderLog(); updateAnalytics(); }
-    setDefaultDate();
-    loadFromGitHub();
+    // Отображение всплывающих уведомлений
+    function showStatus(text, type) {
+        const banner = document.getElementById('statusBanner');
+        banner.innerText = text;
+        banner.className = `status-banner ${type}`;
+        setTimeout(() => { banner.className = 'status-banner'; }, 5000);
+    }
+
+    // Инициализация соединения с GitHub API
+    async function initGitHubCloud() {
+        const tokenInput = document.getElementById('ghToken').value.trim();
+        if (!tokenInput) {
+            showStatus("Пожалуйста, введите токен доступа GitHub", "error");
+            return;
+        }
+
+        GITHUB_TOKEN = tokenInput;
+        localStorage.setItem('stalcraft_gh_token', GITHUB_TOKEN);
+        
+        showStatus("Проверяем соединение с репозиторием...", "success");
+
+        try {
+            // Получаем логин пользователя
+            const userResponse = await fetch('https://api.github.com/user', {
+                headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+            });
+            
+            if (!userResponse.ok) throw new Error("Неверный токен или нет прав доступа");
+            const userData = await userResponse.json();
+            const username = userData.login;
+
+            // Запрашиваем файл в репозитории
+            const fileUrl = `https://api.github.com/repos/${username}/${REPO_NAME}/contents/${FILE_PATH}`;
+            const fileResponse = await fetch(fileUrl, {
+                headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+            });
+
+            if (fileResponse.ok) {
+                const fileData = await fileResponse.json();
+                fileSha = fileData.sha;
+                const decodedContent = decodeURIComponent(atob(fileData.content).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                
+                const cloudState = JSON.parse(decodedContent);
+                
+                // Объединение или перезапись данных при конфликте (выбираем самые актуальные по количеству логов)
+                if (cloudState.logs && cloudState.logs.length >= trackerState.logs.length) {
+                    trackerState = cloudState;
+                    saveToLocalStorage();
+                    updateUI();
+                    showStatus("Данные из Облака успешно импортированы!", "success");
+                } else {
+                    showStatus("Локальные данные новее облачных. Готово к синхронизации.", "success");
+                }
+            } else if (fileResponse.status === 404) {
+                showStatus("Файл данных не найден в репозитории. Будет создан новый при синхронизации.", "success");
+            }
+
+            // Активируем кнопку сохранения в облако
+            document.getElementById('btnSync').disabled = false;
+            document.getElementById('btnConnect').innerText = "Подключено";
+
+        } catch (err) {
+            showStatus(err.message, "error");
+            document.getElementById('btnSync').disabled = true;
+        }
+    }
+
+    // Отправка текущих данных обратно на GitHub
+    async function syncDataToCloud() {
+        if (!GITHUB_TOKEN) return;
+
+        try {
+            const userResponse = await fetch('https://api.github.com/user', {
+                headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+            });
+            const userData = await userResponse.json();
+            const username = userData.login;
+
+            const fileUrl = `https://api.github.com/repos/${username}/${REPO_NAME}/contents/${FILE_PATH}`;
+            
+            // Сначала обновим актуальный SHA файла, чтобы не получить конфликт 409
+            const checkResponse = await fetch(fileUrl, {
+                headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+            });
+            if (checkResponse.ok) {
+                const checkData = await checkResponse.json();
+                fileSha = checkData.sha;
+            }
+
+            const jsonString = JSON.stringify(trackerState, null, 2);
+            // Корректно кодируем строку в Base64 с поддержкой кириллицы
+            const base64Content = btoa(encodeURIComponent(jsonString).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+                return String.fromCharCode('0x' + p1);
+            }));
+
+            const bodyData = {
+                message: `Update income tracker data: Day ${trackerState.currentDay - 1}`,
+                content: base64Content
+            };
+
+            if (fileSha) {
+                bodyData.sha = fileSha;
+            }
+
+            const putResponse = await fetch(fileUrl, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(bodyData)
+            });
+
+            if (putResponse.ok) {
+                const putResult = await putResponse.json();
+                fileSha = putResult.content.sha;
+                showStatus("Облако синхронизировано успешно!", "success");
+            } else {
+                throw new Error("Ошибка при сохранении файла на GitHub");
+            }
+
+        } catch (err) {
+            showStatus(err.message, "error");
+        }
+    }
 </script>
+
 </body>
 </html>
