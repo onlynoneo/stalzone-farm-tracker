@@ -48,7 +48,7 @@
 
         header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             position: relative;
         }
 
@@ -104,7 +104,73 @@
             background: var(--bg-card-hover);
         }
 
-        /* Панель синхронизации */
+        /* Компактная панель облака */
+        .cloud-panel {
+            padding: 15px 25px;
+            margin-bottom: 25px;
+            border-radius: 12px;
+        }
+
+        .cloud-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .cloud-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-red);
+            box-shadow: 0 0 8px var(--accent-red);
+            transition: all 0.3s;
+        }
+
+        .status-dot.active {
+            background: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+
+        .cloud-toggle-btn {
+            font-size: 0.8rem;
+            color: var(--border-glow);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px solid var(--border-dim);
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .cloud-header:hover .cloud-toggle-btn {
+            background: rgba(69, 243, 255, 0.1);
+            border-color: var(--border-glow);
+        }
+
+        .cloud-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .cloud-content.open {
+            max-height: 150px;
+            margin-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 15px;
+        }
+
         .sync-grid {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr;
@@ -453,15 +519,25 @@
         <p>Управление финансами с облачной синхронизацией GitHub</p>
     </header>
 
-    <!-- Блок облака -->
-    <div class="glass-panel">
-        <div class="sync-grid">
-            <div class="input-group">
-                <label for="ghToken">GitHub Personal Access Token</label>
-                <input type="password" id="ghToken" class="input-field" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+    <!-- Компактный скрываемый блок облака -->
+    <div class="glass-panel cloud-panel">
+        <div class="cloud-header" onclick="toggleCloudPanel()">
+            <div class="cloud-status">
+                <div id="statusDot" class="status-dot"></div>
+                <span id="statusText">Облако: отключено</span>
             </div>
-            <button id="btnConnect" class="btn btn-primary" onclick="initGitHubCloud()">Подключить Облако</button>
-            <button id="btnSync" class="btn" onclick="syncDataToCloud()" disabled>Сохранить в Cloud</button>
+            <div id="toggleBtnLabel" class="cloud-toggle-btn">Настройки</div>
+        </div>
+        
+        <div id="cloudContent" class="cloud-content">
+            <div class="sync-grid">
+                <div class="input-group">
+                    <label for="ghToken">GitHub Personal Access Token</label>
+                    <input type="password" id="ghToken" class="input-field" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+                </div>
+                <button id="btnConnect" class="btn btn-primary" onclick="initGitHubCloud()">Подключить</button>
+                <button id="btnSync" class="btn" onclick="syncDataToCloud()" disabled>Сохранить вручную</button>
+            </div>
         </div>
         <div id="statusBanner" class="status-banner"></div>
     </div>
@@ -544,10 +620,25 @@
         }
         if (savedToken) {
             document.getElementById('ghToken').value = savedToken;
+            // Если токен уже сохранен, пробуем автоматически тихо подключиться
+            initGitHubCloud(true); 
         }
         
         updateUI();
     };
+
+    // Функция открытия/закрытия панели настроек облака
+    function toggleCloudPanel() {
+        const content = document.getElementById('cloudContent');
+        const label = document.getElementById('toggleBtnLabel');
+        if (content.classList.contains('open')) {
+            content.classList.remove('open');
+            label.innerText = "Настройки";
+        } else {
+            content.classList.add('open');
+            label.innerText = "Свернуть";
+        }
+    }
 
     // Функция ручного добавления новой записи
     function addEntry() {
@@ -563,7 +654,6 @@
             return;
         }
 
-        // Если чекбокс активен, вычитаем 14% комиссии FunPay
         if (isFunPayCheck.checked && rawAmount > 0) {
             rawAmount = Math.round(rawAmount * 0.86);
             comment += " (FunPay -14%)";
@@ -580,7 +670,6 @@
         trackerState.logs.unshift(newLog);
         trackerState.currentDay++;
 
-        // Сброс полей формы
         amountInput.value = "";
         commentInput.value = "";
         isFunPayCheck.checked = false;
@@ -588,13 +677,11 @@
         saveToLocalStorage();
         updateUI();
         
-        // Автоматический триггер синхронизации, если облако подключено
         if (GITHUB_TOKEN) {
             syncDataToCloud();
         }
     }
 
-    // Удаление отдельной строки
     function deleteLog(dayToDelete) {
         trackerState.logs = trackerState.logs.filter(item => item.day !== dayToDelete);
         saveToLocalStorage();
@@ -605,7 +692,6 @@
         }
     }
 
-    // Полный сброс
     function clearAllData() {
         if (confirm("Вы уверены, что хотите полностью стереть всю историю?")) {
             trackerState = { currentDay: 1, logs: [] };
@@ -621,7 +707,6 @@
         localStorage.setItem('stalcraft_tracker_data', JSON.stringify(trackerState));
     }
 
-    // Подсчет медианы
     function calculateMedian(arr) {
         if (arr.length === 0) return 0;
         const sorted = [...arr].sort((a, b) => a - b);
@@ -629,7 +714,6 @@
         return sorted.length % 2 !== 0 ? sorted[mid] : Math.round((sorted[mid - 1] + sorted[mid]) / 2);
     }
 
-    // Обновление интерфейса страницы
     function updateUI() {
         let totalBalance = 0;
         let totalFunPay = 0;
@@ -664,14 +748,12 @@
             });
         }
 
-        // Обновляем плашки со статистикой
         document.getElementById('statTotal').innerText = `${totalBalance.toLocaleString()} руб.`;
         document.getElementById('statDaysCount').innerText = trackerState.logs.length;
         document.getElementById('statFunpayTotal').innerText = `${totalFunPay.toLocaleString()} руб.`;
         document.getElementById('statMedian').innerText = `${calculateMedian(incomeListForMedian).toLocaleString()} руб.`;
     }
 
-    // Отображение всплывающих уведомлений
     function showStatus(text, type) {
         const banner = document.getElementById('statusBanner');
         banner.innerText = text;
@@ -679,21 +761,20 @@
         setTimeout(() => { banner.className = 'status-banner'; }, 5000);
     }
 
-    // Инициализация соединения с GitHub API
-    async function initGitHubCloud() {
+    // Инициализация соединения с GitHub API (isAuto указывает на скрытый фоновый режим при старте)
+    async function initGitHubCloud(isAuto = false) {
         const tokenInput = document.getElementById('ghToken').value.trim();
         if (!tokenInput) {
-            showStatus("Пожалуйста, введите токен доступа GitHub", "error");
+            if(!isAuto) showStatus("Пожалуйста, введите токен доступа GitHub", "error");
             return;
         }
 
         GITHUB_TOKEN = tokenInput;
         localStorage.setItem('stalcraft_gh_token', GITHUB_TOKEN);
         
-        showStatus("Проверяем соединение с репозиторием...", "success");
+        if(!isAuto) showStatus("Проверяем соединение с репозиторием...", "success");
 
         try {
-            // Получаем логин пользователя
             const userResponse = await fetch('https://api.github.com/user', {
                 headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
             });
@@ -702,7 +783,6 @@
             const userData = await userResponse.json();
             const username = userData.login;
 
-            // Запрашиваем файл в репозитории
             const fileUrl = `https://api.github.com/repos/${username}/${REPO_NAME}/contents/${FILE_PATH}`;
             const fileResponse = await fetch(fileUrl, {
                 headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
@@ -717,30 +797,37 @@
                 
                 const cloudState = JSON.parse(decodedContent);
                 
-                // Объединение или перезапись данных при конфликте (выбираем самые актуальные по количеству логов)
                 if (cloudState.logs && cloudState.logs.length >= trackerState.logs.length) {
                     trackerState = cloudState;
                     saveToLocalStorage();
                     updateUI();
-                    showStatus("Данные из Облака успешно импортированы!", "success");
+                    if(!isAuto) showStatus("Данные из Облака успешно импортированы!", "success");
                 } else {
-                    showStatus("Локальные данные новее облачных. Готово к синхронизации.", "success");
+                    if(!isAuto) showStatus("Локальные данные новее облачных. Готово к синхронизации.", "success");
                 }
             } else if (fileResponse.status === 404) {
-                showStatus("Файл данных не найден в репозитории. Будет создан новый при синхронизации.", "success");
+                if(!isAuto) showStatus("Файл данных не найден в репозитории. Будет создан новый при синхронизации.", "success");
             }
 
-            // Активируем кнопку сохранения в облако
+            // Обновляем визуал статуса на подключенный
+            document.getElementById('statusDot').classList.add('active');
+            document.getElementById('statusText').innerText = `Облако: подключено (${username})`;
             document.getElementById('btnSync').disabled = false;
-            document.getElementById('btnConnect').innerText = "Подключено";
+            document.getElementById('btnConnect').innerText = "Обновить";
+
+            // Если пользователь нажимал кнопку вручную, автоматически сворачиваем панель после успеха
+            if(!isAuto) {
+                setTimeout(() => { toggleCloudPanel(); }, 1000);
+            }
 
         } catch (err) {
-            showStatus(err.message, "error");
+            if(!isAuto) showStatus(err.message, "error");
             document.getElementById('btnSync').disabled = true;
+            document.getElementById('statusDot').classList.remove('active');
+            document.getElementById('statusText').innerText = "Облако: ошибка подключения";
         }
     }
 
-    // Отправка текущих данных обратно на GitHub
     async function syncDataToCloud() {
         if (!GITHUB_TOKEN) return;
 
@@ -753,7 +840,6 @@
 
             const fileUrl = `https://api.github.com/repos/${username}/${REPO_NAME}/contents/${FILE_PATH}`;
             
-            // Сначала обновим актуальный SHA файла, чтобы не получить конфликт 409
             const checkResponse = await fetch(fileUrl, {
                 headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
             });
@@ -763,7 +849,6 @@
             }
 
             const jsonString = JSON.stringify(trackerState, null, 2);
-            // Корректно кодируем строку в Base64 с поддержкой кириллицы
             const base64Content = btoa(encodeURIComponent(jsonString).replace(/%([0-9A-F]{2})/g, function(match, p1) {
                 return String.fromCharCode('0x' + p1);
             }));
