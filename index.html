@@ -107,14 +107,12 @@
         .token-header {
             padding: 16px 24px;
             display: flex;
-            justify-content: space-between;
+            justify-between: space-between;
             align-items: center;
             cursor: pointer;
             user-select: none;
-        }
-
-        .token-header:hover {
-            background: rgba(255, 255, 255, 0.01);
+            display: flex;
+            justify-content: space-between;
         }
 
         .token-title {
@@ -367,7 +365,6 @@
         .stat-card.total-sold .value { color: var(--accent-orange); }
         .stat-card.avg-earned .value { color: var(--accent-purple); }
 
-        /* Секция бэкапа данных */
         .backup-zone {
             margin-top: 8px;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
@@ -434,22 +431,21 @@
 <body>
 
 <div class="dashboard-layout">
-    <!-- ЛЕВАЯ СТОРОНА: ТРЕКЕР И ИСТОРИЯ -->
     <div class="main-panel">
         <div class="header">
             <h1>Мониторинг Фарма Сталкрафта</h1>
         </div>
 
-        <!-- НОВАЯ СВОРАЧИВАЕМАЯ ПЛАШКА ДЛЯ ТОКЕНА -->
+        <!-- БЕЗОПАСНАЯ ВВОДНАЯ ПЛАШКА ДЛЯ ТОКЕНА -->
         <div class="token-panel" id="tokenPanel">
             <div class="token-header" id="tokenToggle">
-                <div class="token-title">Настройки токена</div>
+                <div class="token-title">Настройки интеграции с GitHub</div>
                 <div class="token-arrow">▼</div>
             </div>
             <div class="token-body">
                 <div class="form-group">
-                    <label for="apiToken">API Токен</label>
-                    <input type="password" id="apiToken" placeholder="Введите ваш токен">
+                    <label for="apiToken">GitHub Personal Access Token</label>
+                    <input type="password" id="apiToken" placeholder="Вставь сюда свой ghp_... токен">
                 </div>
             </div>
         </div>
@@ -485,7 +481,6 @@
         </div>
     </div>
 
-    <!-- ПРАВАЯ СТОРОНА: СТАТИСТИКА И БЭКАП -->
     <div class="stats-panel">
         <div class="stats-header">
             <h2>Аналитика аккаунта</h2>
@@ -506,16 +501,11 @@
             <div class="value" id="statAvgEarned">0</div>
         </div>
 
-        <!-- КНОПКИ РЕЗЕРВНОГО КОПИРОВАНИЯ -->
         <div class="backup-zone">
             <div class="backup-title">Резервное копирование</div>
             <div class="backup-buttons">
-                <button class="btn-backup" id="exportBtn">
-                    Экспорт лога
-                </button>
-                <button class="btn-backup" id="importBtn">
-                    Импорт лога
-                </button>
+                <button class="btn-backup" id="exportBtn">Экспорт лога</button>
+                <button class="btn-backup" id="importBtn">Импорт лога</button>
                 <input type="file" id="fileInput" accept=".json">
             </div>
         </div>
@@ -531,32 +521,34 @@
     const soldWrapper = document.getElementById('soldWrapper');
     const historyContainer = document.getElementById('historyContainer');
 
-    // Кнопки импорта/экспорта
     const exportBtn = document.getElementById('exportBtn');
     const importBtn = document.getElementById('importBtn');
     const fileInput = document.getElementById('fileInput');
 
-    // Элементы статистики
     const statTotalEarned = document.getElementById('statTotalEarned');
     const statTotalSold = document.getElementById('statTotalSold');
     const statAvgEarned = document.getElementById('statAvgEarned');
 
-    // ЭЛЕМЕНТЫ ДЛЯ ПЛАШКИ ТОКЕНА
     const tokenPanel = document.getElementById('tokenPanel');
     const tokenToggle = document.getElementById('tokenToggle');
     const apiTokenInput = document.getElementById('apiToken');
 
+    // Константы путей
+    const GITHUB_USER = 'onlynoneo';
+    const GITHUB_REPO = 'stalcraft-tracker'; 
+    const FILE_PATH = 'farm_data.json'; 
+
     let farmLog = JSON.parse(localStorage.getItem('stalcraftFarmLog')) || [];
 
-    // Логика сворачивания/разворачивания плашки токена
+    // Управление плашкой токена
     tokenToggle.addEventListener('click', () => {
         tokenPanel.classList.toggle('active');
     });
 
-    // Сохранение токена при вводе
+    // Извлечение и автосохранение токена локально в браузере
     apiTokenInput.value = localStorage.getItem('stalcraftApiToken') || '';
     apiTokenInput.addEventListener('input', (e) => {
-        localStorage.setItem('stalcraftApiToken', e.target.value);
+        localStorage.setItem('stalcraftApiToken', e.target.value.trim());
     });
 
     function formatNumberWithSpaces(num) {
@@ -578,7 +570,53 @@
         }
     });
 
-    addDayBtn.addEventListener('click', () => {
+    async function uploadToGitHub(data) {
+        const token = localStorage.getItem('stalcraftApiToken');
+        if (!token) {
+            console.log('Токен не задан в интерфейсе. Изменения сохранены только локально.');
+            return;
+        }
+
+        const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${FILE_PATH}`;
+        
+        try {
+            let sha = '';
+            const getRes = await fetch(url, {
+                headers: { 'Authorization': `token ${token}` }
+            });
+            
+            if (getRes.status === 200) {
+                const fileData = await getRes.json();
+                sha = fileData.sha;
+            }
+
+            const contentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+            
+            const putRes = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: `Update farm log: ${new Date().toLocaleDateString()}`,
+                    content: contentBase64,
+                    sha: sha || undefined
+                })
+            });
+
+            if (putRes.ok) {
+                console.log('Синхронизация с GitHub выполнена успешно.');
+            } else {
+                const errData = await putRes.json();
+                console.error('Ошибка API GitHub:', errData.message);
+            }
+        } catch (error) {
+            console.error('Ошибка сети при отправке на GitHub:', error);
+        }
+    }
+
+    addDayBtn.addEventListener('click', async () => {
         const todayBalance = parseFloat(currentBalanceInput.value);
         const todaySold = parseFloat(soldAmountInput.value) || 0;
         const selectedDateRaw = logDateInput.value;
@@ -623,6 +661,7 @@
         setDefaultDate();
 
         renderAll();
+        await uploadToGitHub(farmLog);
     });
 
     function recalculateEarnedValues() {
@@ -669,16 +708,16 @@
         statAvgEarned.textContent = formatNumberWithSpaces(medianEarned);
     }
 
-    window.deleteRow = function(index) {
+    window.deleteRow = async function(index) {
         if(confirm('Удалить эту запись?')) {
             farmLog.splice(index, 1);
             recalculateEarnedValues();
             localStorage.setItem('stalcraftFarmLog', JSON.stringify(farmLog));
             renderAll();
+            await uploadToGitHub(farmLog);
         }
     }
 
-    // ЛОГИКА ЭКСПОРТА В JSON ФАЙЛ
     exportBtn.addEventListener('click', () => {
         if (farmLog.length === 0) {
             alert('Лог пуст, экспортировать нечего.');
@@ -693,7 +732,6 @@
         downloadAnchor.remove();
     });
 
-    // ЛОГИКА ИМПОРТА
     importBtn.addEventListener('click', () => {
         fileInput.click();
     });
@@ -703,31 +741,29 @@
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = function(event) {
+        reader.onload = async function(event) {
             try {
                 const parsedData = JSON.parse(event.target.result);
-                
-                // Простая валидация структуры
                 if (Array.isArray(parsedData)) {
                     if (confirm('Импортируемый файл полностью перезапишет текущую историю в браузере. Продолжить?')) {
                         farmLog = parsedData;
                         localStorage.setItem('stalcraftFarmLog', JSON.stringify(farmLog));
                         renderAll();
+                        await uploadToGitHub(farmLog);
                     }
                 } else {
                     alert('Ошибка: Файл имеет некорректный формат.');
                 }
             } catch (err) {
-                alert('Не удалось прочитать файл. Убедитесь, что это правильный бэкап-файл JSON.');
+                alert('Не удалось прочитать файл.');
             }
-            fileInput.value = ''; // Сбрасываем инпут
+            fileInput.value = '';
         };
         reader.readAsText(file);
     });
 
     function renderLog() {
         historyContainer.innerHTML = '';
-
         if (farmLog.length === 0) {
             historyContainer.innerHTML = '<div style="text-align:center; color:var(--text-muted); font-size:14px; padding:20px;">Лог чист. Занеси баланс, чтобы начать мониторинг.</div>';
             return;
@@ -735,7 +771,6 @@
 
         farmLog.forEach((item, index) => {
             const row = document.createElement('div');
-            
             let statusClass = '';
             let earnedClass = '';
             let sign = '';
@@ -755,25 +790,21 @@
             row.className = `history-row ${statusClass}`;
             row.innerHTML = `
                 <div class="cell-date">${item.date}</div>
-                
                 <div>
                     <div class="cell-label">Заработано фармом</div>
                     <div class="cell-value ${earnedClass}">
                         ${index === farmLog.length - 1 ? '— (База)' : sign + formatNumberWithSpaces(item.earned)}
                     </div>
                 </div>
-
                 <div>
                     <div class="cell-label">Баланс на счету</div>
                     <div class="cell-value">${formatNumberWithSpaces(item.balance)}</div>
                     ${item.sold > 0 ? `<span class="sub-sold">Продано: ${formatNumberWithSpaces(item.sold)}</span>` : ''}
                 </div>
-
                 <div>
                     <button class="btn-delete" onclick="deleteRow(${index})">Удалить</button>
                 </div>
             `;
-
             historyContainer.appendChild(row);
         });
     }
