@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stalcraft Farm Tracker</title>
-	<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%230f111a' stroke='%23818cf8' stroke-width='8'/><path d='M50 10A40 40 0 0 1 90 50A40 40 0 0 0 50 10' fill='%23818cf8'/></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%230f111a' stroke='%23818cf8' stroke-width='8'/><path d='M50 10A40 40 0 0 1 90 50A40 40 0 0 0 50 10' fill='%23818cf8'/></svg>">
     <style>
         :root {
             --bg-gradient-start: #0f111a;
@@ -22,12 +22,7 @@
             --card-inner-bg: rgba(255, 255, 255, 0.02);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
 
         body {
             background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
@@ -48,7 +43,7 @@
             align-items: start;
         }
 
-        .main-panel {
+        .main-panel, .stats-panel {
             background: var(--panel-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
@@ -59,13 +54,6 @@
         }
 
         .stats-panel {
-            background: var(--panel-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--panel-border);
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
             gap: 24px;
@@ -73,26 +61,24 @@
             top: 40px;
         }
 
-        .header {
-            margin-bottom: 32px;
-            text-align: left;
-        }
-
+        .header { margin-bottom: 32px; }
         .header h1 {
             font-size: 26px;
             font-weight: 800;
             background: linear-gradient(to right, #fff, var(--text-muted));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
         }
 
-        .stats-header h2 {
-            font-size: 18px;
-            font-weight: 800;
-            color: #fff;
-            letter-spacing: -0.3px;
-            margin-bottom: 8px;
+        .config-block {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
         }
 
         .input-block {
@@ -113,21 +99,9 @@
             align-items: flex-end;
         }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            flex-grow: 1;
-        }
-
-        label {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.75px;
-        }
-
+        .form-group { display: flex; flex-direction: column; gap: 8px; flex-grow: 1; }
+        label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.75px; }
+        
         input {
             width: 100%;
             background: var(--input-bg);
@@ -138,33 +112,8 @@
             font-size: 15px;
             font-weight: 600;
             outline: none;
-            transition: all 0.25s ease;
         }
-
-        input:focus {
-            border-color: var(--input-focus);
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
-        }
-
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-        }
-
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        input[type=number] {
-            -moz-appearance: textfield;
-        }
-
-        .sold-toggle-zone {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+        input:focus { border-color: var(--input-focus); }
 
         .btn-trigger-sold {
             background: rgba(251, 146, 60, 0.1);
@@ -176,44 +125,17 @@
             font-weight: 700;
             cursor: pointer;
             align-self: flex-start;
-            transition: all 0.2s;
         }
 
-        .btn-trigger-sold:hover {
-            background: var(--accent-orange);
-            color: #000;
-        }
-
-        .sold-input-wrapper {
-            display: none;
-            animation: fadeIn 0.2s ease;
-        }
-
-        .sold-input-wrapper.active {
-            display: flex;
-        }
+        .sold-input-wrapper { display: none; }
+        .sold-input-wrapper.active { display: flex; }
 
         .btn-submit {
-            background: #ffffff;
-            color: #000000;
-            border: none;
-            padding: 14px 24px;
-            border-radius: 12px;
-            font-weight: 800;
-            font-size: 15px;
-            cursor: pointer;
-            height: 50px;
-            transition: opacity 0.2s;
+            background: #ffffff; color: #000; border: none; padding: 14px 24px;
+            border-radius: 12px; font-weight: 800; font-size: 15px; cursor: pointer; height: 50px;
         }
 
-        .btn-submit:hover { opacity: 0.9; }
-
-        .history-list {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
+        .history-list { display: flex; flex-direction: column; gap: 14px; }
         .history-row {
             background: var(--card-inner-bg);
             border: 1px solid rgba(255, 255, 255, 0.04);
@@ -224,167 +146,52 @@
             align-items: center;
             gap: 20px;
             position: relative;
-            overflow: hidden;
         }
+        .history-row.has-profit::before { content: ''; position: absolute; top:0; left:0; width:4px; height:100%; background: var(--accent-green); }
+        .history-row.has-loss::before { content: ''; position: absolute; top:0; left:0; width:4px; height:100%; background: #ef4444; }
 
-        .history-row::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: rgba(255,255,255,0.05);
-        }
-        .history-row.has-profit::before { background: var(--accent-green); }
-        .history-row.has-loss::before { background: #ef4444; }
-
-        .cell-date {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--text-muted);
-        }
-
-        .cell-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            font-weight: 600;
-            margin-bottom: 4px;
-            letter-spacing: 0.5px;
-        }
-
-        .cell-value {
-            font-size: 17px;
-            font-weight: 700;
-            font-variant-numeric: tabular-nums;
-        }
-
+        .cell-date { font-size: 15px; font-weight: 700; color: var(--text-muted); }
+        .cell-label { font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+        .cell-value { font-size: 17px; font-weight: 700; }
         .cell-value.green { color: var(--accent-green); }
         .cell-value.red { color: #ef4444; }
-        
-        .sub-sold {
-            font-size: 12px;
-            color: var(--accent-orange);
-            font-weight: 600;
-            margin-top: 4px;
-            display: block;
-        }
+        .sub-sold { color: var(--accent-orange); font-size: 12px; display: block; margin-top: 4px; }
 
-        .btn-delete {
-            background: none;
-            border: none;
-            color: rgba(239, 68, 68, 0.4);
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 700;
-            padding: 6px 12px;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
+        .btn-delete { background: none; border: none; color: rgba(239, 68, 68, 0.4); cursor: pointer; font-weight: 700; }
+        .btn-delete:hover { color: #ef4444; }
 
-        .btn-delete:hover {
-            color: #ef4444;
-            background: rgba(239, 68, 68, 0.08);
-        }
-
-        .stat-card {
-            background: var(--card-inner-bg);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 16px;
-            padding: 20px;
-        }
-
-        .stat-card .label {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.75px;
-            margin-bottom: 8px;
-        }
-
-        .stat-card .value {
-            font-size: 22px;
-            font-weight: 800;
-            font-variant-numeric: tabular-nums;
-        }
-
+        .stat-card { background: var(--card-inner-bg); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 16px; padding: 20px; }
+        .stat-card .label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+        .stat-card .value { font-size: 22px; font-weight: 800; }
         .stat-card.total-earned .value { color: var(--accent-green); }
         .stat-card.total-sold .value { color: var(--accent-orange); }
         .stat-card.avg-earned .value { color: var(--accent-purple); }
 
-        /* Секция бэкапа данных */
-        .backup-zone {
-            margin-top: 8px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding-top: 24px;
-        }
-
-        .backup-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.75px;
-            margin-bottom: 14px;
-        }
-
-        .backup-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .btn-backup {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: var(--text-main);
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-backup:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.15);
-        }
-
-        #fileInput {
-            display: none;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-4px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 1024px) {
-            .dashboard-layout { grid-template-columns: 1fr; }
-            .stats-panel { position: static; }
-        }
-
-        @media (max-width: 768px) {
-            .inputs-inline { grid-template-columns: 1fr; }
-            .history-row { grid-template-columns: 1fr; gap: 12px; padding: 20px; }
-            .btn-submit { width: 100%; }
-        }
+        .sync-status { font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="dashboard-layout">
-    <!-- ЛЕВАЯ СТОРОНА: ТРЕКЕР И ИСТОРИЯ -->
     <div class="main-panel">
         <div class="header">
-            <h1>Мониторинг Фарма Сталкрафта</h1>
+            <h1>Мониторинг Фарма Сталкрафта Cloud</h1>
+        </div>
+
+        <!-- Настройка облака -->
+        <div class="config-block">
+            <div class="form-group">
+                <label>GitHub Токен (Классический)</label>
+                <input type="password" id="ghToken" placeholder="ghp_...">
+            </div>
+            <div class="form-group">
+                <label>Твой ник на GitHub</label>
+                <input type="text" id="ghUser" placeholder="username">
+            </div>
+            <div class="form-group">
+                <label>Имя репозитория</label>
+                <input type="text" id="ghRepo" placeholder="stalcraft-tracker" value="stalcraft-tracker">
+            </div>
         </div>
 
         <div class="input-block">
@@ -393,65 +200,41 @@
                     <label for="logDate">Дата занесения</label>
                     <input type="date" id="logDate">
                 </div>
-                
                 <div class="form-group">
                     <label for="currentBalance">Нынешний баланс на счету</label>
                     <input type="number" id="currentBalance" placeholder="Введите">
                 </div>
-                
                 <button class="btn-submit" id="addDayBtn">Добавить день</button>
             </div>
-
             <div class="sold-toggle-zone">
                 <button class="btn-trigger-sold" id="toggleSoldBtn">+ ПРОДАНО СЕГОДНЯ</button>
                 <div class="sold-input-wrapper" id="soldWrapper">
                     <div class="form-group">
                         <label for="soldAmount">Сколько слил на FunPay за сегодня</label>
-                        <input type="number" id="soldAmount" value="0" placeholder="Например: 2000000">
+                        <input type="number" id="soldAmount" value="0">
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="history-list" id="historyContainer">
-            <!-- Строки логов -->
-        </div>
+        <div class="history-list" id="historyContainer"></div>
     </div>
 
-    <!-- ПРАВАЯ СТОРОНА: СТАТИСТИКА И БЭКАП -->
     <div class="stats-panel">
-        <div class="stats-header">
-            <h2>Аналитика аккаунта</h2>
-        </div>
-
+        <div class="stats-header"><h2>Аналитика аккаунта</h2></div>
         <div class="stat-card total-earned">
             <div class="label">Заработано за всё время</div>
             <div class="value" id="statTotalEarned">0</div>
         </div>
-
         <div class="stat-card total-sold">
             <div class="label">Всего слито (FunPay)</div>
             <div class="value" id="statTotalSold">0</div>
         </div>
-
         <div class="stat-card avg-earned">
             <div class="label">Медиана дохода (в день)</div>
             <div class="value" id="statAvgEarned">0</div>
         </div>
-
-        <!-- КНОПКИ РЕЗЕРВНОГО КОПИРОВАНИЯ -->
-        <div class="backup-zone">
-            <div class="backup-title">Резервное копирование</div>
-            <div class="backup-buttons">
-                <button class="btn-backup" id="exportBtn">
-                    Экспорт лога
-                </button>
-                <button class="btn-backup" id="importBtn">
-                    Импорт лога
-                </button>
-                <input type="file" id="fileInput" accept=".json">
-            </div>
-        </div>
+        <div class="sync-status" id="syncStatus">Статус: Загрузка локальных данных...</div>
     </div>
 </div>
 
@@ -463,49 +246,138 @@
     const toggleSoldBtn = document.getElementById('toggleSoldBtn');
     const soldWrapper = document.getElementById('soldWrapper');
     const historyContainer = document.getElementById('historyContainer');
-
-    // Кнопки импорта/экспорта
-    const exportBtn = document.getElementById('exportBtn');
-    const importBtn = document.getElementById('importBtn');
-    const fileInput = document.getElementById('fileInput');
-
-    // Элементы статистики
     const statTotalEarned = document.getElementById('statTotalEarned');
     const statTotalSold = document.getElementById('statTotalSold');
     const statAvgEarned = document.getElementById('statAvgEarned');
+    const syncStatus = document.getElementById('syncStatus');
 
-    let farmLog = JSON.parse(localStorage.getItem('stalcraftFarmLog')) || [];
+    const ghTokenInput = document.getElementById('ghToken');
+    const ghUserInput = document.getElementById('ghUser');
+    const ghRepoInput = document.getElementById('ghRepo');
 
-    function formatNumberWithSpaces(num) {
-        return Math.round(num).toLocaleString('ru-RU');
+    let farmLog = [];
+    let fileSha = ""; // Нужно GitHub для перезаписи файла
+
+    // Загрузка настроек из localStorage
+    ghTokenInput.value = localStorage.getItem('gh_token') || '';
+    ghUserInput.value = localStorage.getItem('gh_user') || '';
+    ghRepoInput.value = localStorage.getItem('gh_repo') || 'stalcraft-tracker';
+
+    function saveConfig() {
+        localStorage.setItem('gh_token', ghTokenInput.value);
+        localStorage.setItem('gh_user', ghUserInput.value);
+        localStorage.setItem('gh_repo', ghRepoInput.value);
     }
+
+    ghTokenInput.addEventListener('change', () => { saveConfig(); loadFromGitHub(); });
+    ghUserInput.addEventListener('change', () => { saveConfig(); loadFromGitHub(); });
+    ghRepoInput.addEventListener('change', () => { saveConfig(); loadFromGitHub(); });
+
+    function formatNumberWithSpaces(num) { return Math.round(num).toLocaleString('ru-RU'); }
 
     function setDefaultDate() {
         const today = new Date();
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const dd = String(today.getDate()).padStart(2, '0');
-        logDateInput.value = `${yyyy}-${mm}-${dd}`;
+        logDateInput.value = today.toISOString().split('T')[0];
     }
 
     toggleSoldBtn.addEventListener('click', () => {
         soldWrapper.classList.toggle('active');
-        if(!soldWrapper.classList.contains('active')) {
-            soldAmountInput.value = '0';
-        }
+        if(!soldWrapper.classList.contains('active')) soldAmountInput.value = '0';
     });
 
-    addDayBtn.addEventListener('click', () => {
+    // Функция загрузки базы из GitHub репозитория (файл data.json)
+    async function loadFromGitHub() {
+        const token = ghTokenInput.value;
+        const user = ghUserInput.value;
+        const repo = ghRepoInput.value;
+
+        if (!token || !user || !repo) {
+            syncStatus.textContent = "Статус: Введи данные GitHub для синхронизации";
+            // Временный откат на локальное хранилище
+            farmLog = JSON.parse(localStorage.getItem('stalcraftFarmLog')) || [];
+            renderAll();
+            return;
+        }
+
+        syncStatus.textContent = "Статус: Синхронизация с облаком...";
+        const url = `https://api.github.com/repos/${user}/${repo}/contents/data.json`;
+
+        try {
+            const res = await fetch(url, {
+                headers: { 'Authorization': `token ${token}` }
+            });
+            if (res.status === 200) {
+                const data = await res.json();
+                fileSha = data.sha;
+                const content = decodeURIComponent(atob(data.content).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                farmLog = JSON.parse(content);
+                syncStatus.textContent = "Статус: Облачные данные загружены";
+            } else if (res.status === 404) {
+                syncStatus.textContent = "Статус: Облачный файл не найден, будет создан новый";
+                farmLog = [];
+            }
+        } catch (err) {
+            syncStatus.textContent = "Статус: Ошибка сети при связи с GitHub";
+        }
+        renderAll();
+    }
+
+    // Функция сохранения лога на GitHub
+    async function saveToGitHub() {
+        const token = ghTokenInput.value;
+        const user = ghUserInput.value;
+        const repo = ghRepoInput.value;
+
+        // Дублируем локально на всякий случай
+        localStorage.setItem('stalcraftFarmLog', JSON.stringify(farmLog));
+
+        if (!token || !user || !repo) return;
+
+        syncStatus.textContent = "Статус: Сохранение в облако...";
+        const url = `https://api.github.com/repos/${user}/${repo}/contents/data.json`;
+        
+        // Корректный перевод кириллицы в base64
+        const jsonStr = JSON.stringify(farmLog, null, 2);
+        const b64Content = btoa(encodeURIComponent(jsonStr).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+            return String.fromCharCode('0x' + p1);
+        }));
+
+        const bodyData = {
+            message: "auto-update farm log",
+            content: b64Content
+        };
+        if (fileSha) bodyData.sha = fileSha;
+
+        try {
+            const res = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(bodyData)
+            });
+            if (res.ok) {
+                const resData = await res.json();
+                fileSha = resData.content.sha; // Обновляем SHA для следующих коммитов
+                syncStatus.textContent = "Статус: Данные успешно сохранены на GitHub!";
+            } else {
+                syncStatus.textContent = "Статус: Ошибка сохранения на GitHub";
+            }
+        } catch (err) {
+            syncStatus.textContent = "Статус: Ошибка сети при отправке";
+        }
+    }
+
+    addDayBtn.addEventListener('click', async () => {
         const todayBalance = parseFloat(currentBalanceInput.value);
         const todaySold = parseFloat(soldAmountInput.value) || 0;
         const selectedDateRaw = logDateInput.value;
 
-        if (!selectedDateRaw) {
-            alert('Выбери дату');
-            return;
-        }
-        if (isNaN(todayBalance) || todayBalance < 0) {
-            alert('Введи актуальный баланс счета');
+        if (!selectedDateRaw || isNaN(todayBalance) || todayBalance < 0) {
+            alert('Заполни корректно дату и баланс');
             return;
         }
 
@@ -514,11 +386,9 @@
 
         const existingIndex = farmLog.findIndex(item => item.date === formattedDate);
         if (existingIndex !== -1) {
-            if(confirm(`Запись за ${formattedDate} уже существует. Перезаписать ее?`)) {
+            if(confirm(`Запись за ${formattedDate} уже есть. Перезаписать?`)) {
                 farmLog.splice(existingIndex, 1);
-            } else {
-                return;
-            }
+            } else { return; }
         }
 
         farmLog.push({
@@ -532,14 +402,13 @@
         farmLog.sort((a, b) => new Date(b.rawDate) - new Date(a.rawDate));
         recalculateEarnedValues();
 
-        localStorage.setItem('stalcraftFarmLog', JSON.stringify(farmLog));
-
         currentBalanceInput.value = '';
         soldAmountInput.value = '0';
         soldWrapper.classList.remove('active');
         setDefaultDate();
 
         renderAll();
+        await saveToGitHub();
     });
 
     function recalculateEarnedValues() {
@@ -562,147 +431,68 @@
 
     function updateAnalytics() {
         if (farmLog.length < 2) {
-            statTotalEarned.textContent = '0';
-            statTotalSold.textContent = '0';
-            statAvgEarned.textContent = '0';
+            statTotalEarned.textContent = '0'; statTotalSold.textContent = '0'; statAvgEarned.textContent = '0';
             return;
         }
-
-        let totalEarned = 0;
-        let totalSold = 0;
-        let activeDays = [];
-
+        let totalEarned = 0; let totalSold = 0; let activeDays = [];
         for (let i = 0; i < farmLog.length - 1; i++) {
             totalEarned += farmLog[i].earned;
             totalSold += farmLog[i].sold;
             activeDays.push(farmLog[i]);
         }
-
         const earnedValues = activeDays.map(d => d.earned);
-        const medianEarned = calculateMedian(earnedValues);
-
         statTotalEarned.textContent = formatNumberWithSpaces(totalEarned);
         statTotalSold.textContent = formatNumberWithSpaces(totalSold);
-        statAvgEarned.textContent = formatNumberWithSpaces(medianEarned);
+        statAvgEarned.textContent = formatNumberWithSpaces(calculateMedian(earnedValues));
     }
 
-    window.deleteRow = function(index) {
+    window.deleteRow = async function(index) {
         if(confirm('Удалить эту запись?')) {
             farmLog.splice(index, 1);
             recalculateEarnedValues();
-            localStorage.setItem('stalcraftFarmLog', JSON.stringify(farmLog));
             renderAll();
+            await saveToGitHub();
         }
     }
 
-    // ЛОГИКА ЭКСПОРТА В JSON ФАЙЛ
-    exportBtn.addEventListener('click', () => {
-        if (farmLog.length === 0) {
-            alert('Лог пуст, экспортировать нечего.');
-            return;
-        }
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(farmLog, null, 2));
-        const downloadAnchor = document.createElement('a');
-        downloadAnchor.setAttribute("href", dataStr);
-        downloadAnchor.setAttribute("download", "stalcraft_backup.json");
-        document.body.appendChild(downloadAnchor);
-        downloadAnchor.click();
-        downloadAnchor.remove();
-    });
-
-    // ЛОГИКА ИМПОРТА
-    importBtn.addEventListener('click', () => {
-        fileInput.click();
-    });
-
-    fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            try {
-                const parsedData = JSON.parse(event.target.result);
-                
-                // Простая валидация структуры
-                if (Array.isArray(parsedData)) {
-                    if (confirm('Импортируемый файл полностью перезапишет текущую историю в браузере. Продолжить?')) {
-                        farmLog = parsedData;
-                        localStorage.setItem('stalcraftFarmLog', JSON.stringify(farmLog));
-                        renderAll();
-                    }
-                } else {
-                    alert('Ошибка: Файл имеет некорректный формат.');
-                }
-            } catch (err) {
-                alert('Не удалось прочитать файл. Убедитесь, что это правильный бэкап-файл JSON.');
-            }
-            fileInput.value = ''; // Сбрасываем инпут
-        };
-        reader.readAsText(file);
-    });
-
     function renderLog() {
         historyContainer.innerHTML = '';
-
         if (farmLog.length === 0) {
-            historyContainer.innerHTML = '<div style="text-align:center; color:var(--text-muted); font-size:14px; padding:20px;">Лог чист. Занеси баланс, чтобы начать мониторинг.</div>';
+            historyContainer.innerHTML = '<div style="text-align:center; color:var(--text-muted); font-size:14px; padding:20px;">Лог пуст. Занеси первый баланс.</div>';
             return;
         }
 
         farmLog.forEach((item, index) => {
             const row = document.createElement('div');
-            
-            let statusClass = '';
-            let earnedClass = '';
-            let sign = '';
+            let statusClass = ''; let earnedClass = ''; let sign = '';
 
-            if (index === farmLog.length - 1) {
-                earnedClass = '';
-                sign = '';
-            } else if (item.earned > 0) {
-                statusClass = 'has-profit';
-                earnedClass = 'green';
-                sign = '+';
-            } else if (item.earned < 0) {
-                statusClass = 'has-loss';
-                earnedClass = 'red';
-            }
+            if (index === farmLog.length - 1) { earnedClass = ''; sign = ''; }
+            else if (item.earned > 0) { statusClass = 'has-profit'; earnedClass = 'green'; sign = '+'; }
+            else if (item.earned < 0) { statusClass = 'has-loss'; earnedClass = 'red'; }
 
             row.className = `history-row ${statusClass}`;
             row.innerHTML = `
                 <div class="cell-date">${item.date}</div>
-                
                 <div>
                     <div class="cell-label">Заработано фармом</div>
                     <div class="cell-value ${earnedClass}">
                         ${index === farmLog.length - 1 ? '— (База)' : sign + formatNumberWithSpaces(item.earned)}
                     </div>
                 </div>
-
                 <div>
                     <div class="cell-label">Баланс на счету</div>
                     <div class="cell-value">${formatNumberWithSpaces(item.balance)}</div>
                     ${item.sold > 0 ? `<span class="sub-sold">Продано: ${formatNumberWithSpaces(item.sold)}</span>` : ''}
                 </div>
-
-                <div>
-                    <button class="btn-delete" onclick="deleteRow(${index})">Удалить</button>
-                </div>
+                <div><button class="btn-delete" onclick="deleteRow(${index})">Удалить</button></div>
             `;
-
             historyContainer.appendChild(row);
         });
     }
 
-    function renderAll() {
-        renderLog();
-        updateAnalytics();
-    }
-
+    function renderAll() { renderLog(); updateAnalytics(); }
     setDefaultDate();
-    renderAll();
+    loadFromGitHub();
 </script>
-
 </body>
 </html>
