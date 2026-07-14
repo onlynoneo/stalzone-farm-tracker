@@ -40,7 +40,8 @@
             min-height: 100vh;
             display: grid;
             place-items: center;
-            padding: 20px;
+            /* УВЕЛИЧИЛИ ОТСТУПЫ: 80px сверху/снизу для свободы и 20px по бокам */
+            padding: 80px 20px;
         }
 
         .dashboard-layout {
@@ -466,6 +467,7 @@
             .history-row { grid-template-columns: 1fr; gap: 12px; padding: 20px; }
             .btn-submit { width: 100%; }
             .dynamic-inputs-zone { grid-template-columns: 1fr; }
+            body { padding: 40px 16px; } /* На мобилках сделаем чуть поменьше */
         }
     </style>
 </head>
@@ -596,7 +598,7 @@
     const FILE_PATH = 'farm_data.json'; 
 
     let farmLog = JSON.parse(localStorage.getItem('stalcraftFarmLog')) || [];
-    let syncTimeout = null; // Для дебаунса запросов к GitHub
+    let syncTimeout = null; 
 
     tokenToggle.addEventListener('click', () => {
         tokenPanel.classList.toggle('active');
@@ -635,7 +637,6 @@
         }
     });
 
-    // Оптимизированная функция отправки с дебаунсом и индикатором статуса
     function triggerGitHubSync(data) {
         if (syncTimeout) {
             clearTimeout(syncTimeout);
@@ -656,7 +657,7 @@
                 syncIndicator.style.color = 'var(--accent-red)';
                 syncIndicator.textContent = 'Ошибка синхронизации';
             }
-        }, 3000); // Ждём 3 секунды "тишины" перед коммитом
+        }, 3000); 
     }
 
     async function uploadToGitHub(data) {
