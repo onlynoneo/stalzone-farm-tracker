@@ -30,14 +30,17 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
+        html, body {
+            height: 100%;
+        }
+
         body {
             background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
             color: var(--text-main);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 40px 20px;
+            display: grid;
+            place-items: center;
+            padding: 20px;
         }
 
         .dashboard-layout {
@@ -96,7 +99,6 @@
             margin-bottom: 8px;
         }
 
-        /* СТИЛИ ДЛЯ ПЛАШКИ ТОКЕНА */
         .token-panel {
             background: rgba(255, 255, 255, 0.01);
             border: 1px solid rgba(255, 255, 255, 0.04);
@@ -209,7 +211,6 @@
             -moz-appearance: textfield;
         }
 
-        /* КНОПКИ ДЕЙСТВИЙ В ОДИН РЯД */
         .action-triggers-row {
             display: flex;
             gap: 12px;
@@ -245,7 +246,6 @@
             color: var(--accent-red);
         }
 
-        /* ЗОНА ДИНАМИЧЕСКИХ ПОЛЕЙ */
         .dynamic-inputs-zone {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -441,6 +441,16 @@
             display: none;
         }
 
+        .sync-indicator {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: -10px;
+            margin-bottom: 10px;
+            display: none;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-4px); }
             to { opacity: 1; transform: translateY(0); }
@@ -504,6 +514,8 @@
             </div>
         </div>
 
+        <div class="sync-indicator" id="syncIndicator">Синхронизация...</div>
+
         <div class="history-list" id="historyContainer">
             </div>
     </div>
@@ -565,6 +577,7 @@
     const lostWrapper = document.getElementById('lostWrapper');
     
     const historyContainer = document.getElementById('historyContainer');
+    const syncIndicator = document.getElementById('syncIndicator');
 
     const exportBtn = document.getElementById('exportBtn');
     const importBtn = document.getElementById('importBtn');
@@ -578,19 +591,17 @@
     const tokenToggle = document.getElementById('tokenToggle');
     const apiTokenInput = document.getElementById('apiToken');
 
-    // Константы путей
     const GITHUB_USER = 'onlynoneo';
     const GITHUB_REPO = 'stalzone-farm-tracker'; 
     const FILE_PATH = 'farm_data.json'; 
 
     let farmLog = JSON.parse(localStorage.getItem('stalcraftFarmLog')) || [];
+    let syncTimeout = null; // Для дебаунса запросов к GitHub
 
-    // Управление плашкой токена
     tokenToggle.addEventListener('click', () => {
         tokenPanel.classList.toggle('active');
     });
 
-    // Извлечение и автосохранение токена локально в браузере
     apiTokenInput.value = localStorage.getItem('stalcraftApiToken') || '';
     apiTokenInput.addEventListener('input', (e) => {
         localStorage.setItem('stalcraftApiToken', e.target.value.trim());
@@ -608,7 +619,6 @@
         logDateInput.value = `${yyyy}-${mm}-${dd}`;
     }
 
-    // Переключение кнопок акцентов
     toggleSoldBtn.addEventListener('click', () => {
         soldWrapper.classList.toggle('active');
         toggleSoldBtn.classList.toggle('active-sold');
@@ -625,11 +635,35 @@
         }
     });
 
+    // Оптимизированная функция отправки с дебаунсом и индикатором статуса
+    function triggerGitHubSync(data) {
+        if (syncTimeout) {
+            clearTimeout(syncTimeout);
+        }
+        
+        syncIndicator.style.display = 'block';
+        syncIndicator.style.color = 'var(--accent-orange)';
+        syncIndicator.textContent = 'Ожидание изменений...';
+
+        syncTimeout = setTimeout(async () => {
+            syncIndicator.textContent = 'Синхронизация с GitHub...';
+            const success = await uploadToGitHub(data);
+            if (success) {
+                syncIndicator.style.color = 'var(--accent-green)';
+                syncIndicator.textContent = 'Синхронизировано!';
+                setTimeout(() => { syncIndicator.style.display = 'none'; }, 2000);
+            } else {
+                syncIndicator.style.color = 'var(--accent-red)';
+                syncIndicator.textContent = 'Ошибка синхронизации';
+            }
+        }, 3000); // Ждём 3 секунды "тишины" перед коммитом
+    }
+
     async function uploadToGitHub(data) {
         const token = localStorage.getItem('stalcraftApiToken');
         if (!token) {
-            console.log('Токен не задан в интерфейсе. Изменения сохранены только локально.');
-            return;
+            console.log('Токен не задан. Сохранение только локально.');
+            return false;
         }
 
         const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${FILE_PATH}`;
@@ -654,7 +688,7 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    message: `Update farm log: ${new Date().toLocaleDateString()}`,
+                    message: `Auto-update farm data: ${new Date().toLocaleDateString()}`,
                     content: contentBase64,
                     sha: sha || undefined
                 })
@@ -662,16 +696,19 @@
 
             if (putRes.ok) {
                 console.log('Синхронизация с GitHub выполнена успешно.');
+                return true;
             } else {
                 const errData = await putRes.json();
                 console.error('Ошибка API GitHub:', errData.message);
+                return false;
             }
         } catch (error) {
             console.error('Ошибка сети при отправке на GitHub:', error);
+            return false;
         }
     }
 
-    addDayBtn.addEventListener('click', async () => {
+    addDayBtn.addEventListener('click', () => {
         const todayBalance = parseFloat(currentBalanceInput.value);
         const todaySold = parseFloat(soldAmountInput.value) || 0;
         const todayLost = parseFloat(lostAmountInput.value) || 0;
@@ -724,7 +761,7 @@
         setDefaultDate();
 
         renderAll();
-        await uploadToGitHub(farmLog);
+        triggerGitHubSync(farmLog);
     });
 
     function recalculateEarnedValues() {
@@ -733,7 +770,6 @@
                 farmLog[i].earned = 0;
             } else {
                 const prevDay = farmLog[i + 1];
-                // Прибавляем и проданное, и утерянное, чтобы верно отобразить чистый доход
                 const sold = farmLog[i].sold || 0;
                 const lost = farmLog[i].lost || 0;
                 farmLog[i].earned = (farmLog[i].balance - prevDay.balance) + sold + lost;
@@ -774,13 +810,13 @@
         statAvgEarned.textContent = formatNumberWithSpaces(medianEarned);
     }
 
-    window.deleteRow = async function(index) {
+    window.deleteRow = function(index) {
         if(confirm('Удалить эту запись?')) {
             farmLog.splice(index, 1);
             recalculateEarnedValues();
             localStorage.setItem('stalcraftFarmLog', JSON.stringify(farmLog));
             renderAll();
-            await uploadToGitHub(farmLog);
+            triggerGitHubSync(farmLog);
         }
     }
 
@@ -807,7 +843,7 @@
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = async function(event) {
+        reader.onload = function(event) {
             try {
                 const parsedData = JSON.parse(event.target.result);
                 if (Array.isArray(parsedData)) {
@@ -815,7 +851,7 @@
                         farmLog = parsedData;
                         localStorage.setItem('stalcraftFarmLog', JSON.stringify(farmLog));
                         renderAll();
-                        await uploadToGitHub(farmLog);
+                        triggerGitHubSync(farmLog);
                     }
                 } else {
                     alert('Ошибка: Файл имеет некорректный формат.');
