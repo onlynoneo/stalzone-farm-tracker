@@ -40,7 +40,7 @@
             min-height: 100vh;
             display: grid;
             place-items: center;
-            padding: 80px 20px;
+            padding: 60px 20px;
         }
 
         .dashboard-layout {
@@ -48,7 +48,7 @@
             grid-template-columns: 1.8fr 1fr;
             gap: 32px;
             width: 100%;
-            max-width: 1200px;
+            max-width: 1240px;
             align-items: start;
         }
 
@@ -68,11 +68,11 @@
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--panel-border);
             border-radius: 24px;
-            padding: 40px;
+            padding: 32px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 20px;
             position: sticky;
             top: 40px;
         }
@@ -91,23 +91,23 @@
             letter-spacing: -0.5px;
         }
 
-        .stats-header h2 {
-            font-size: 18px;
+        .panel-section-title {
+            font-size: 16px;
             font-weight: 800;
             color: #fff;
             letter-spacing: -0.3px;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
-        .token-panel {
+        .collapsible-panel {
             background: rgba(255, 255, 255, 0.01);
             border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 18px;
+            border-radius: 16px;
             overflow: hidden;
         }
 
-        .token-header {
-            padding: 16px 24px;
+        .collapsible-header {
+            padding: 14px 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -115,7 +115,7 @@
             user-select: none;
         }
 
-        .token-title {
+        .collapsible-title {
             font-size: 11px;
             font-weight: 700;
             color: var(--text-muted);
@@ -126,23 +126,23 @@
             gap: 8px;
         }
 
-        .token-arrow {
+        .collapsible-arrow {
             font-size: 12px;
             color: var(--text-muted);
             transition: transform 0.2s ease;
         }
 
-        .token-panel.active .token-arrow {
+        .collapsible-panel.active .collapsible-arrow {
             transform: rotate(180deg);
         }
 
-        .token-body {
+        .collapsible-body {
             display: none;
-            padding: 0 24px 24px 24px;
+            padding: 0 18px 18px 18px;
             animation: fadeIn 0.2s ease;
         }
 
-        .token-panel.active .token-body {
+        .collapsible-panel.active .collapsible-body {
             display: block;
         }
 
@@ -184,9 +184,9 @@
             background: var(--input-bg);
             border: 1px solid var(--input-border);
             color: var(--text-main);
-            padding: 14px 16px;
+            padding: 12px 14px;
             border-radius: 12px;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             outline: none;
             transition: all 0.25s ease;
@@ -265,12 +265,12 @@
             background: #ffffff;
             color: #000000;
             border: none;
-            padding: 14px 24px;
+            padding: 12px 20px;
             border-radius: 12px;
             font-weight: 800;
-            font-size: 15px;
+            font-size: 14px;
             cursor: pointer;
-            height: 50px;
+            height: 45px;
             transition: opacity 0.2s;
         }
 
@@ -286,11 +286,11 @@
             background: var(--card-inner-bg);
             border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 16px;
-            padding: 22px 28px;
+            padding: 20px 24px;
             display: grid;
-            grid-template-columns: 0.8fr 1.5fr 1.5fr auto;
+            grid-template-columns: 0.8fr 1.3fr 1.5fr auto;
             align-items: center;
-            gap: 20px;
+            gap: 16px;
             position: relative;
             overflow: hidden;
         }
@@ -323,7 +323,7 @@
         }
 
         .cell-value {
-            font-size: 17px;
+            font-size: 16px;
             font-weight: 700;
             font-variant-numeric: tabular-nums;
         }
@@ -350,6 +350,12 @@
             font-weight: 600;
         }
 
+        .sub-over {
+            font-size: 12px;
+            color: var(--accent-purple);
+            font-weight: 600;
+        }
+
         .btn-delete {
             background: none;
             border: none;
@@ -371,7 +377,7 @@
             background: var(--card-inner-bg);
             border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 16px;
-            padding: 20px;
+            padding: 16px;
         }
 
         .stat-card .label {
@@ -380,26 +386,83 @@
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.75px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .stat-card .value {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 800;
             font-variant-numeric: tabular-nums;
         }
 
         .stat-card.total-earned .value { color: var(--accent-green); }
-        .stat-card.total-sold .value { color: var(--accent-orange); }
-        .stat-card.avg-earned .value { color: var(--accent-purple); }
 
-        .backup-zone {
-            margin-top: 8px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding-top: 24px;
+        .calc-panel {
+            background: var(--card-inner-bg);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 18px;
+            padding: 18px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 14px;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .calc-results {
+            background: rgba(10, 12, 20, 0.5);
+            border-radius: 12px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .calc-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .calc-row .res-label {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .calc-row .res-val {
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .calc-row.highlight {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 8px;
+            margin-top: 2px;
+        }
+
+        .calc-row.highlight .res-label {
+            color: #fff;
+            font-weight: 800;
+        }
+
+        .calc-row.highlight .res-val {
+            color: var(--accent-green);
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .backup-zone {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .backup-title {
@@ -413,16 +476,16 @@
         .backup-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
         }
 
         .btn-backup {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.08);
             color: var(--text-main);
-            padding: 12px;
+            padding: 10px;
             border-radius: 10px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -437,9 +500,7 @@
             border-color: rgba(255, 255, 255, 0.15);
         }
 
-        #fileInput {
-            display: none;
-        }
+        #fileInput { display: none; }
 
         .sync-indicator {
             font-size: 11px;
@@ -463,10 +524,10 @@
 
         @media (max-width: 768px) {
             .inputs-inline { grid-template-columns: 1fr; }
-            .history-row { grid-template-columns: 1fr; gap: 12px; padding: 20px; }
+            .history-row { grid-template-columns: 1fr; gap: 12px; padding: 18px; }
             .btn-submit { width: 100%; }
             .dynamic-inputs-zone { grid-template-columns: 1fr; }
-            body { padding: 40px 16px; }
+            body { padding: 20px 12px; }
         }
     </style>
 </head>
@@ -486,7 +547,7 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="currentBalance">Нынешний баланс на счету</label>
+                    <label for="currentBalance">Баланс на счету</label>
                     <input type="number" id="currentBalance" placeholder="Введите">
                 </div>
                 
@@ -501,7 +562,7 @@
             <div class="dynamic-inputs-zone">
                 <div class="toggle-input-wrapper" id="soldWrapper">
                     <div class="form-group">
-                        <label for="soldAmount">Слито на FunPay за сегодня</label>
+                        <label for="soldAmount">Продано за сегодня</label>
                         <input type="number" id="soldAmount" value="0" placeholder="Например: 2000000">
                     </div>
                 </div>
@@ -521,44 +582,90 @@
     </div>
 
     <div class="stats-panel">
-        <div class="stats-header">
-            <h2>Аналитика аккаунта</h2>
-        </div>
+        <div class="panel-section-title">Аналитика и финансовый блок</div>
 
         <div class="stat-card total-earned">
             <div class="label">Заработано за всё время</div>
             <div class="value" id="statTotalEarned">0</div>
         </div>
 
-        <div class="stat-card total-sold">
-            <div class="label">Всего слито (FunPay)</div>
-            <div class="value" id="statTotalSold">0</div>
+        <!-- Калькулятор выплат -->
+        <div class="calc-panel">
+            <div class="panel-section-title" style="font-size: 13px;">Калькулятор расчёта</div>
+            
+            <div class="calc-grid">
+                <div class="form-group">
+                    <label for="calcCredited">Зачислено (грн)</label>
+                    <input type="number" id="calcCredited" placeholder="1500" value="1500">
+                </div>
+                <div class="form-group">
+                    <label for="calcPersonal">Личные (грн)</label>
+                    <input type="number" id="calcPersonal" placeholder="0" value="0">
+                </div>
+            </div>
+
+            <div class="calc-results">
+                <div class="calc-row">
+                    <span class="res-label">Сверх лимита (грн):</span>
+                    <span class="res-val" id="resOver" style="color: var(--accent-orange);">0</span>
+                </div>
+                <div class="calc-row">
+                    <span class="res-label">База для 20%:</span>
+                    <span class="res-val" id="resBase">0</span>
+                </div>
+                <div class="calc-row">
+                    <span class="res-label">Комиссия (20%):</span>
+                    <span class="res-val" id="resFee" style="color: var(--accent-purple);">0</span>
+                </div>
+                <div class="calc-row">
+                    <span class="res-label">Остаток на балансе:</span>
+                    <span class="res-val" id="resRemain">0</span>
+                </div>
+                <div class="calc-row highlight">
+                    <span class="res-label">Выплата (Сверх + 20%):</span>
+                    <span class="res-val" id="resTotalPay">0</span>
+                </div>
+            </div>
         </div>
 
-        <div class="stat-card avg-earned">
-            <div class="label">Медиана дохода (в день)</div>
-            <div class="value" id="statAvgEarned">0</div>
+        <!-- Компактная настройка лимита -->
+        <div class="collapsible-panel" id="limitPanel">
+            <div class="collapsible-header" id="limitToggle">
+                <div class="collapsible-title">Лимит накопления</div>
+                <div class="collapsible-arrow">▼</div>
+            </div>
+            <div class="collapsible-body">
+                <div class="form-group">
+                    <label for="limitAmount">Целевой лимит (руб/игровая валюта)</label>
+                    <input type="number" id="limitAmount" placeholder="4500000">
+                </div>
+            </div>
+        </div>
+
+        <!-- Настройки Синхронизации JSONbin.io -->
+        <div class="collapsible-panel" id="jsonbinPanel">
+            <div class="collapsible-header" id="jsonbinToggle">
+                <div class="collapsible-title">Настройки JSONbin.io</div>
+                <div class="collapsible-arrow">▼</div>
+            </div>
+            <div class="collapsible-body">
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label for="jsonbinBinId">Bin ID</label>
+                    <input type="text" id="jsonbinBinId" placeholder="64x...">
+                </div>
+                <div class="form-group">
+                    <label for="jsonbinApiKey">Master Key / Access Key</label>
+                    <input type="password" id="jsonbinApiKey" placeholder="$2b$10$...">
+                </div>
+            </div>
         </div>
 
         <div class="backup-zone">
             <div class="backup-title">Резервное копирование</div>
             <div class="backup-buttons">
-                <button class="btn-backup" id="exportBtn">Экспорт лога</button>
-                <button class="btn-backup" id="importBtn">Импорт лога</button>
+                <button class="btn-backup" id="exportBtn">Экспорт</button>
+                <button class="btn-backup" id="importBtn">Импорт</button>
                 <input type="file" id="fileInput" accept=".json">
-            </div>
-        </div>
-
-        <div class="token-panel" id="tokenPanel">
-            <div class="token-header" id="tokenToggle">
-                <div class="token-title">Настройки GitHub</div>
-                <div class="token-arrow">▼</div>
-            </div>
-            <div class="token-body">
-                <div class="form-group">
-                    <label for="apiToken">GitHub Personal Access Token</label>
-                    <input type="password" id="apiToken" placeholder="Вставь ghp_... токен">
-                </div>
             </div>
         </div>
     </div>
@@ -584,27 +691,53 @@
     const fileInput = document.getElementById('fileInput');
 
     const statTotalEarned = document.getElementById('statTotalEarned');
-    const statTotalSold = document.getElementById('statTotalSold');
-    const statAvgEarned = document.getElementById('statAvgEarned');
 
-    const tokenPanel = document.getElementById('tokenPanel');
-    const tokenToggle = document.getElementById('tokenToggle');
-    const apiTokenInput = document.getElementById('apiToken');
+    // Настройка лимита
+    const limitPanel = document.getElementById('limitPanel');
+    const limitToggle = document.getElementById('limitToggle');
+    const limitAmountInput = document.getElementById('limitAmount');
 
-    const GITHUB_USER = 'onlynoneo';
-    const GITHUB_REPO = 'stalzone-farm-tracker'; 
-    const FILE_PATH = 'farm_data.json'; 
+    // JSONbin Настройки
+    const jsonbinPanel = document.getElementById('jsonbinPanel');
+    const jsonbinToggle = document.getElementById('jsonbinToggle');
+    const jsonbinBinIdInput = document.getElementById('jsonbinBinId');
+    const jsonbinApiKeyInput = document.getElementById('jsonbinApiKey');
+
+    // Калькулятор
+    const calcCreditedInput = document.getElementById('calcCredited');
+    const calcPersonalInput = document.getElementById('calcPersonal');
+    const resOver = document.getElementById('resOver');
+    const resBase = document.getElementById('resBase');
+    const resFee = document.getElementById('resFee');
+    const resRemain = document.getElementById('resRemain');
+    const resTotalPay = document.getElementById('resTotalPay');
 
     let farmLog = JSON.parse(localStorage.getItem('stalcraftFarmLog')) || [];
-    let syncTimeout = null; 
+    let syncTimeout = null;
 
-    tokenToggle.addEventListener('click', () => {
-        tokenPanel.classList.toggle('active');
+    // Лимит накопления по умолчанию
+    let targetLimit = parseFloat(localStorage.getItem('stalcraftTargetLimit')) || 4500000;
+    limitAmountInput.value = targetLimit;
+
+    limitToggle.addEventListener('click', () => limitPanel.classList.toggle('active'));
+    jsonbinToggle.addEventListener('click', () => jsonbinPanel.classList.toggle('active'));
+
+    limitAmountInput.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value) || 0;
+        targetLimit = val;
+        localStorage.setItem('stalcraftTargetLimit', val);
+        renderAll();
     });
 
-    apiTokenInput.value = localStorage.getItem('stalcraftApiToken') || '';
-    apiTokenInput.addEventListener('input', (e) => {
-        localStorage.setItem('stalcraftApiToken', e.target.value.trim());
+    // Настройки JSONbin.io
+    jsonbinBinIdInput.value = localStorage.getItem('stalcraftJsonbinBinId') || '';
+    jsonbinApiKeyInput.value = localStorage.getItem('stalcraftJsonbinApiKey') || '';
+
+    jsonbinBinIdInput.addEventListener('input', (e) => {
+        localStorage.setItem('stalcraftJsonbinBinId', e.target.value.trim());
+    });
+    jsonbinApiKeyInput.addEventListener('input', (e) => {
+        localStorage.setItem('stalcraftJsonbinApiKey', e.target.value.trim());
     });
 
     function formatNumberWithSpaces(num) {
@@ -635,18 +768,17 @@
         }
     });
 
-    function triggerGitHubSync(data) {
-        if (syncTimeout) {
-            clearTimeout(syncTimeout);
-        }
+    // Синхронизация через JSONbin.io
+    function triggerSync(data) {
+        if (syncTimeout) clearTimeout(syncTimeout);
         
         syncIndicator.style.display = 'block';
         syncIndicator.style.color = 'var(--accent-orange)';
         syncIndicator.textContent = 'Ожидание изменений...';
 
         syncTimeout = setTimeout(async () => {
-            syncIndicator.textContent = 'Синхронизация с GitHub...';
-            const success = await uploadToGitHub(data);
+            syncIndicator.textContent = 'Синхронизация с JSONbin...';
+            const success = await uploadToJsonbin(data);
             if (success) {
                 syncIndicator.style.color = 'var(--accent-green)';
                 syncIndicator.textContent = 'Синхронизировано!';
@@ -658,61 +790,38 @@
         }, 500); 
     }
 
-    async function uploadToGitHub(data) {
-        const token = localStorage.getItem('stalcraftApiToken');
-        if (!token) {
-            console.log('Токен не задан. Сохранение только локально.');
+    async function uploadToJsonbin(data) {
+        const binId = localStorage.getItem('stalcraftJsonbinBinId');
+        const apiKey = localStorage.getItem('stalcraftJsonbinApiKey');
+
+        if (!binId || !apiKey) {
+            console.log('JSONbin credentials не заданы. Сохранение только локально.');
             return false;
         }
 
-        // Кэш-бастер в URL обходит кэширование браузера и решает проблему с заголовками CORS preflight
-        const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${FILE_PATH}?t=${Date.now()}`;
+        const url = `https://api.jsonbin.io/v3/b/${binId}`;
         
         try {
-            let sha = '';
-            // GET запрос без заголовка Cache-Control
-            const getRes = await fetch(url, {
-                headers: { 
-                    'Authorization': `token ${token}`,
-                    'Accept': 'application/vnd.github+json'
-                }
-            });
-            
-            if (getRes.status === 200) {
-                const fileData = await getRes.json();
-                sha = fileData.sha;
-            }
-
-            // Безопасное кодирование UTF-8 в Base64 (без ломающих кириллицу методов)
-            const jsonString = JSON.stringify(data, null, 2);
-            const contentBase64 = btoa(encodeURIComponent(jsonString).replace(/%([0-9A-F]{2})/g, function(match, p1) {
-                return String.fromCharCode(parseInt(p1, 16));
-            }));
-            
-            const putRes = await fetch(url, {
+            const response = await fetch(url, {
                 method: 'PUT',
                 headers: {
-                    'Authorization': `token ${token}`,
                     'Content-Type': 'application/json',
-                    'Accept': 'application/vnd.github+json'
+                    'X-Master-Key': apiKey,
+                    'X-Bin-Versioning': 'false'
                 },
-                body: JSON.stringify({
-                    message: `Auto-update farm data: ${new Date().toLocaleDateString()}`,
-                    content: contentBase64,
-                    sha: sha || undefined
-                })
+                body: JSON.stringify(data)
             });
 
-            if (putRes.ok) {
-                console.log('Синхронизация с GitHub выполнена успешно.');
+            if (response.ok) {
+                console.log('Данные успешно сохранены в JSONbin.');
                 return true;
             } else {
-                const errData = await putRes.json();
-                console.error('Ошибка API GitHub:', errData.message);
+                const errData = await response.json();
+                console.error('Ошибка JSONbin API:', errData.message || response.statusText);
                 return false;
             }
         } catch (error) {
-            console.error('Ошибка сети или кодирования при отправке на GitHub:', error);
+            console.error('Ошибка сети при отправке на JSONbin:', error);
             return false;
         }
     }
@@ -770,7 +879,7 @@
         setDefaultDate();
 
         renderAll();
-        triggerGitHubSync(farmLog);
+        triggerSync(farmLog);
     });
 
     function recalculateEarnedValues() {
@@ -786,38 +895,46 @@
         }
     }
 
-    function calculateMedian(arr) {
-        if (arr.length === 0) return 0;
-        const sorted = [...arr].sort((a, b) => a - b);
-        const mid = Math.floor(sorted.length / 2);
-        return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
-    }
-
     function updateAnalytics() {
         if (farmLog.length < 2) {
             statTotalEarned.textContent = '0';
-            statTotalSold.textContent = '0';
-            statAvgEarned.textContent = '0';
             return;
         }
 
         let totalEarned = 0;
-        let totalSold = 0;
-        let activeDays = [];
-
         for (let i = 0; i < farmLog.length - 1; i++) {
             totalEarned += farmLog[i].earned;
-            totalSold += farmLog[i].sold || 0;
-            activeDays.push(farmLog[i]);
         }
 
-        const earnedValues = activeDays.map(d => d.earned);
-        const medianEarned = calculateMedian(earnedValues);
-
         statTotalEarned.textContent = formatNumberWithSpaces(totalEarned);
-        statTotalSold.textContent = formatNumberWithSpaces(totalSold);
-        statAvgEarned.textContent = formatNumberWithSpaces(medianEarned);
     }
+
+    // Логика Калькулятора
+    function updateCalculator() {
+        const credited = parseFloat(calcCreditedInput.value) || 0;
+        const personal = parseFloat(calcPersonalInput.value) || 0; // Это и есть твои 100% средства (сверх лимита)
+
+        // Чистая база, которая делится на 80% и 20%
+        const baseForFee = Math.max(0, credited - personal);
+        
+        // Твои 20% от базы
+        const fee20 = baseForFee * 0.20;
+        
+        // 80% от базы, которые остаются на балансе/в накоплении
+        const remainInAcc = baseForFee * 0.80;
+        
+        // Твой итоговый вывод: Личные (100%) + Комиссия (20%)
+        const totalPayOut = personal + fee20;
+
+        resOver.textContent = formatNumberWithSpaces(personal);
+        resBase.textContent = formatNumberWithSpaces(baseForFee);
+        resFee.textContent = formatNumberWithSpaces(fee20);
+        resRemain.textContent = formatNumberWithSpaces(remainInAcc);
+        resTotalPay.textContent = formatNumberWithSpaces(totalPayOut);
+    }
+
+    calcCreditedInput.addEventListener('input', updateCalculator);
+    calcPersonalInput.addEventListener('input', updateCalculator);
 
     window.deleteRow = function(index) {
         if(confirm('Удалить эту запись?')) {
@@ -825,7 +942,7 @@
             recalculateEarnedValues();
             localStorage.setItem('stalcraftFarmLog', JSON.stringify(farmLog));
             renderAll();
-            triggerGitHubSync(farmLog);
+            triggerSync(farmLog);
         }
     }
 
@@ -843,9 +960,7 @@
         downloadAnchor.remove();
     });
 
-    importBtn.addEventListener('click', () => {
-        fileInput.click();
-    });
+    importBtn.addEventListener('click', () => fileInput.click());
 
     fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
@@ -860,7 +975,7 @@
                         farmLog = parsedData;
                         localStorage.setItem('stalcraftFarmLog', JSON.stringify(farmLog));
                         renderAll();
-                        triggerGitHubSync(farmLog);
+                        triggerSync(farmLog);
                     }
                 } else {
                     alert('Ошибка: Файл имеет некорректный формат.');
@@ -900,6 +1015,9 @@
 
             const sold = item.sold || 0;
             const lost = item.lost || 0;
+            const overLimitAmount = (index !== farmLog.length - 1 && item.earned > targetLimit) 
+                ? (item.earned - targetLimit) 
+                : 0;
 
             row.className = `history-row ${statusClass}`;
             row.innerHTML = `
@@ -914,6 +1032,7 @@
                     <div class="cell-label">Баланс на счету</div>
                     <div class="cell-value">${formatNumberWithSpaces(item.balance)}</div>
                     <div class="sub-details-container">
+                        ${overLimitAmount > 0 ? `<span class="sub-over">Сверх лимита: +${formatNumberWithSpaces(overLimitAmount)}</span>` : ''}
                         ${sold > 0 ? `<span class="sub-sold">Продано: ${formatNumberWithSpaces(sold)}</span>` : ''}
                         ${lost > 0 ? `<span class="sub-lost">Утеряно: ${formatNumberWithSpaces(lost)}</span>` : ''}
                     </div>
@@ -929,6 +1048,7 @@
     function renderAll() {
         renderLog();
         updateAnalytics();
+        updateCalculator();
     }
 
     setDefaultDate();
